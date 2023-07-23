@@ -6,7 +6,6 @@
 
 #define len(x) sizeof(x)/sizeof(*x)
 
-
 int main() {
 	// Constructing Student
 	Course test1 = {
@@ -25,7 +24,7 @@ int main() {
 		"PC101",
 		2,
 		3,
-		"B+"
+		"B"
 	};
 	Course awawa = {
 		"AWAWA",
