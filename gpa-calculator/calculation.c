@@ -27,7 +27,7 @@ float get_grade_point(char* grade) {
 }
 
 float get_student_gpa(Student student, int sem) {
-	/* Calculates gpa given the grades and credit hours array. Could also calcuate cgpa since it uses the same concept */
+	/* Calculates gpa of a student of a semester */
 	float total_quality_points = 0;
 	int total_credit_hours = 0;
 
@@ -42,7 +42,7 @@ float get_student_gpa(Student student, int sem) {
 }
 
 float get_student_cgpa(Student student) {
-	/* Calculates gpa given the grades and credit hours array. Could also calcuate cgpa since it uses the same concept */
+	/* Calculates cgpa of a student */
 	float total_quality_points = 0;
 	int total_credit_hours = 0;
 
