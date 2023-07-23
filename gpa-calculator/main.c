@@ -4,6 +4,8 @@
 #include <db.h>
 #include <stdlib.h>
 
+#define len(x) sizeof(x)/sizeof(*x)
+
 
 int main() {
 	// Constructing Student
@@ -23,7 +25,7 @@ int main() {
 		"PC101",
 		2,
 		3,
-		"B"
+		"B+"
 	};
 	Course awawa = {
 		"AWAWA",
@@ -42,24 +44,39 @@ int main() {
 		"WB01234",
 		"STUDENT",
 		courses,
-		sizeof(courses) / sizeof(*courses)
+		len(courses)
 	};
 
-	// getting courses of a semester
-	Course* buff = (Course*)calloc(stud1.number_of_courses, sizeof(Course));  // initialize null array to store result
-	filter_sem_courses(1, courses, sizeof(courses) / sizeof(*courses), buff);
-	// printing results
-	for (int i = 0; i < stud1.number_of_courses; i++) {
-		if (buff[i].course_code) {
-			// if element exists
-			printf("%s grade=%s credit_hours=%d\n", buff[i].course_code, buff[i].grade, buff[i].credit_hours);
-		}
-	}
-	free(buff);
+	// creating db in memory
+	sqlite3* db;
+	sqlite3_open(":memory:", &db);
+	init_db(db);
+	
+	// storing student
+	if (store_student(db, stud1) == 0)
+		printf("stored Student\n");
+	else
+		printf("error encountered storing student\n");
+	if (store_student_courses(db, stud1) == 0)
+		printf("stored student's Courses\n");
+	else
+		printf("error encountered storing courses\n");
+	
+	// getting student
+	Student student = get_student(db, "WB01234");
 
 	printf("\n");
+	// printing values
+	// courses enrolled
+	for (int i = 0; i < student.number_of_courses; i++) {
+		printf("%s credit_hours=%d grade=%s\n", student.courses[i].course_code, student.courses[i].credit_hours, student.courses[i].grade);
+	};
+	// names
+	printf("\nStudent id=%s name=%s\n", student.id, student.name);
+	// gpa and cgpa
+	printf("\nGPA (sem 1)=%f CGPA=%f", get_student_gpa(student, 1), get_student_cgpa(student));
 
-	// count gpa
-	printf("GPA = %f", get_student_gpa(stud1, 1));
-	return 0;
+	// cleanup
+	free_student(student);
+	sqlite3_close(db);
 }
