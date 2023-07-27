@@ -59,7 +59,7 @@ int store_student(sqlite3* db, Student student) {
 		return -1;
 	}
 
-	// sql is one-indexed
+	// bind is one-indexed, retrieving data (ie, sqlite_column) is zero-indexed
 	sqlite3_bind_text(stmt, 1, student.id, strlen(student.id), NULL);  // (stmt, index, value, bytesize, flag) 
 	sqlite3_bind_text(stmt, 2, student.name, strlen(student.name), NULL);
 
@@ -122,7 +122,10 @@ int get_number_of_courses(sqlite3* db, char* stud_id) {
 	}
 	
 	sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
+
+	// run the sql
 	ret = sqlite3_step(stmt);
+
 	if (ret == SQLITE_ROW) {
 		number_of_courses = sqlite3_column_int(stmt, 0);
 	}
@@ -150,17 +153,31 @@ int get_student_courses(sqlite3* db, char* stud_id, Course* buff) {
 
 	sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
 
+	char* course_code;
+	char* grade;
 	for (
 		int i = 0, ret = sqlite3_step(stmt);  // 1. run the sql
 		ret == SQLITE_ROW;  // 2. check have result
 		i++, ret = sqlite3_step(stmt)  // 3. go next row and continue at 2.
 		) 
 	{	
+		// duplicating string because pointer is destroyed after sql_finalize
+		// that also means it need to be freed when not used
+		course_code = _strdup(sqlite3_column_text(stmt, 1));
+		grade = _strdup(sqlite3_column_text(stmt, 4));
+
+		// handling allocation failure
+		if ((course_code == NULL) || (grade == NULL)) {  // allocation failure, will NOT return Student
+			fprintf(stderr, "Allocation error when duplicating course_code and grade.");
+			return;
+		};
+
+		// initialize Course
 		buff[i] = (Course){
-			_strdup(sqlite3_column_text(stmt, 1)),  // duplicate string, original pointer is destroyed after sqlite3_finalize
+			course_code,
 			sqlite3_column_int(stmt, 2),
 			sqlite3_column_int(stmt, 3),
-			_strdup(sqlite3_column_text(stmt, 4))
+			grade
 		};
 	};
 
@@ -193,17 +210,40 @@ Student get_student(sqlite3* db, char* stud_id) {
 
 	// run the sql
 	ret = sqlite3_step(stmt);
+
+	char* student_id;
+	char* student_name;
 	if (ret == SQLITE_ROW) {
 		int number_of_courses = get_number_of_courses(db, stud_id);
+
+		// courses get put into the courses buffer
 		Course* courses = calloc(number_of_courses, sizeof(Course));
 		get_student_courses(db, stud_id, courses);
 
+		if (courses == NULL) {
+			fprintf(stderr, "Courses cannot be loaded. Exiting the function");
+			return;
+		};
+
+		// duplicating string because pointer is destroyed after sql_finalize
+		// that also means it need to be freed when not used
+		student_id = _strdup(sqlite3_column_text(stmt, 0));
+		student_name = _strdup(sqlite3_column_text(stmt, 1));
+
+		// handling allocation failure
+		if ((student_id == NULL) || (student_name == NULL)) {  // allocation failure, will NOT return Student
+			fprintf(stderr, "Allocation error when duplicating student_id and name.");
+			return;
+		};
+
+		// constructing Student
 		student = (Student){
-			_strdup(sqlite3_column_text(stmt, 0)),
-			_strdup(sqlite3_column_text(stmt, 1)),
+			student_id,
+			student_name,
 			courses,
 			number_of_courses
 		};
+
 		sqlite3_finalize(stmt);
 		return student;
 	};
