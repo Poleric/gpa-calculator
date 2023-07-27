@@ -22,7 +22,7 @@
     <ClCompile Include="..\dep\sqlite3.c" />
     <ClCompile Include="calculation.c" />
     <ClCompile Include="db.c" />
-    <ClCompile Include="main.c" />
+    <ClCompile Include="test.c" />
     <ClCompile Include="student.c" />
   </ItemGroup>
   <ItemGroup>

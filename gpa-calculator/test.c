@@ -38,12 +38,12 @@ int main() {
 		4,
 		"B+"
 	};
-	Course courses[5] = { test1, test2, pc, awawa, aba };
+	Course* pCourses[5] = { &test1, &test2, &pc, &awawa, &aba };
 	Student stud1 = {
 		"WB01234",
 		"STUDENT",
-		courses,
-		len(courses)
+		pCourses,
+		len(pCourses)
 	};
 
 	// creating db in memory
@@ -52,30 +52,31 @@ int main() {
 	init_db(db);
 	
 	// storing student
-	if (store_student(db, stud1) == 0)
+	if (store_student(db, &stud1) == 0)
 		printf("stored Student\n");
 	else
 		printf("error encountered storing student\n");
-	if (store_student_courses(db, stud1) == 0)
+	if (store_student_courses(db, &stud1) == 0)
 		printf("stored student's Courses\n");
 	else
 		printf("error encountered storing courses\n");
-	
-	// getting student
-	Student student = get_student(db, "WB01234");
 
 	printf("\n");
+	// getting student
+	printf("Getting Student %s\n", "WB01234");
+	Student* pStudent = get_student(db, "WB01234");
+
 	// printing values
 	// courses enrolled
-	for (int i = 0; i < student.number_of_courses; i++) {
-		printf("%s credit_hours=%d grade=%s\n", student.courses[i].course_code, student.courses[i].credit_hours, student.courses[i].grade);
+	for (int i = 0; i < pStudent->number_of_courses; i++) {
+		printf("%s credit_hours=%d grade=%s\n", pStudent->pCourses[i]->course_code, pStudent->pCourses[i]->credit_hours, pStudent->pCourses[i]->grade);
 	};
 	// names
-	printf("\nStudent id=%s name=%s\n", student.id, student.name);
+	printf("\nStudent id=%s name=%s\n", pStudent->id, pStudent->name);
 	// gpa and cgpa
-	printf("\nGPA (sem 1)=%f CGPA=%f", get_student_gpa(student, 1), get_student_cgpa(student));
+	printf("\nGPA (sem 1)=%f CGPA=%f\n", get_student_gpa(pStudent, 1), get_student_cgpa(pStudent));
 
 	// cleanup
-	free_student(student);
+	free_student(pStudent);
 	sqlite3_close(db);
 }
