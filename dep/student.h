@@ -13,10 +13,10 @@ typedef struct Course {
 typedef struct Student {
 	char* id;
 	char* name;
-	struct Course* courses;
+	struct Course** pCourses;
 	int number_of_courses;  // number of courses over all semesters (to keep track of array size lmao)
 } Student;
 
-int filter_sem_courses(int sem, struct Course*, size_t course_len, struct Course* buff);
+int filter_sem_courses(int sem, Course** pCourses, size_t course_len, Course** buff);
 
 #endif

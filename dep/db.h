@@ -6,13 +6,13 @@
 #define DB_H
 
 int init_db(sqlite3* db);
-int store_student_courses(sqlite3* db, Student student);
-int store_student(sqlite3* db, Student student);
+int store_student_courses(sqlite3* db, Student* pStudent);
+int store_student(sqlite3* db, Student* pStudent);
 
 int get_number_of_courses(sqlite3* db, char* stud_id);
-int get_student_courses(sqlite3* db, char* stud_id, Course* buff);
-Student get_student(sqlite3* db, char* stud_id);
+int get_student_courses(sqlite3* db, char* stud_id, Course** buff);
+Student* get_student(sqlite3* db, char* stud_id);
 
-int free_student(Student student);
+int free_student(Student* pStudent);
 
 #endif
