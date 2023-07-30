@@ -18,7 +18,7 @@ int init_db(sqlite3* db) {
 			"student_name TEXT NOT NULL"
 		");"
 		"CREATE TABLE IF NOT EXISTS registered_courses ("
-			"course_id INT PRIMARY KEY,"
+			"course_id INTEGER PRIMARY KEY,"
 			"course_code VARCHAR(7) NOT NULL,"
 			"semester INT NOT NULL,"
 			"credit_hours INT NOT NULL,"
@@ -180,6 +180,7 @@ int get_student_courses(sqlite3* db, char* stud_id, Course** buff) {
 		};
 
 		// initialize Course
+		pCourse->sql_id = sqlite3_column_int(stmt, 0);  // sql id
 		pCourse->course_code = course_code;
 		pCourse->sem = sqlite3_column_int(stmt, 2);  // sem
 		pCourse->credit_hours = sqlite3_column_int(stmt, 3);  // credit_hours
@@ -258,6 +259,51 @@ Student* get_student(sqlite3* db, char* stud_id) {
 
 	sqlite3_finalize(stmt);
 	return;
+}
+
+// alias
+int update_student(sqlite3* db, Student* pStudent) {
+	return store_student(db, pStudent);
+}
+
+// carbon copy of store_student_courses, except for sql statement and an extra value bind
+int update_student_courses(sqlite3* db, Student* pStudent) {
+	/* Store student's Courses into `registered_courses` table */
+
+	sqlite3_stmt* stmt;
+
+	int ret = sqlite3_prepare(
+		db,
+		"INSERT OR REPLACE INTO registered_courses (course_id, course_code, semester, credit_hours, grade, student_id) VALUES (?, ?, ?, ?, ?, ?);",
+		-1,
+		&stmt,
+		NULL
+	);
+
+	if (ret != SQLITE_OK) {
+		fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+		return -1;
+	}
+
+	for (int i = 0; i < pStudent->number_of_courses; i++) {
+		if (pStudent->pCourses[i]->sql_id != NULL) {
+			sqlite3_bind_int(stmt, 1, pStudent->pCourses[i]->sql_id);
+			sqlite3_bind_text(stmt, 2, pStudent->pCourses[i]->course_code, strlen(pStudent->pCourses[i]->course_code), NULL);
+			sqlite3_bind_int(stmt, 3, pStudent->pCourses[i]->sem);
+			sqlite3_bind_int(stmt, 4, pStudent->pCourses[i]->credit_hours);
+			sqlite3_bind_text(stmt, 5, pStudent->pCourses[i]->grade, strlen(pStudent->pCourses[i]->grade), NULL);
+			sqlite3_bind_text(stmt, 6, pStudent->id, strlen(pStudent->id), NULL);
+
+			sqlite3_step(stmt);
+			sqlite3_reset(stmt);
+		}
+		else {
+			fprintf(stderr, "Course %s cannot be updated because sql_id is NULL.", pStudent->pCourses[i]->course_code)
+		}
+	}
+
+	sqlite3_finalize(stmt);
+	return 0;
 }
 
 // utils function for freeing memory allocated after finishing

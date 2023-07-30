@@ -13,6 +13,9 @@ int get_number_of_courses(sqlite3* db, char* stud_id);
 int get_student_courses(sqlite3* db, char* stud_id, Course** buff);
 Student* get_student(sqlite3* db, char* stud_id);
 
+int update_student(sqlite3* db, Student* pStudent);
+int update_student_courses(sqlite3* db, Student* pStudent);
+
 int free_student(Student* pStudent);
 
 #endif

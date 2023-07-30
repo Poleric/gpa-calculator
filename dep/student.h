@@ -4,6 +4,7 @@
 #define STUDENT_H
 
 typedef struct Course {
+	int sql_id;
 	char* course_code;
 	unsigned int sem;
 	unsigned int credit_hours;
