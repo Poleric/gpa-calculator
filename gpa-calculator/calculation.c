@@ -26,29 +26,29 @@ float get_grade_point(char* grade) {
 		return -1.0;
 }
 
-float get_student_gpa(Student student, int sem) {
+float get_student_gpa(Student* pStudent, int sem) {
 	/* Calculates gpa of a student of a semester */
 	float total_quality_points = 0;
 	int total_credit_hours = 0;
 
-	for (int i = 0; i < student.number_of_courses; i++) {
-		if (student.courses[i].sem == sem) { // for gpa purposes
-			total_quality_points += get_grade_point(student.courses[i].grade) * student.courses[i].credit_hours;  // grade_point * credit_hours
-			total_credit_hours += student.courses[i].credit_hours;
+	for (int i = 0; i < pStudent->number_of_courses; i++) {
+		if (pStudent->pCourses[i]->sem == sem) { // for gpa purposes
+			total_quality_points += get_grade_point(pStudent->pCourses[i]->grade) * pStudent->pCourses[i]->credit_hours;  // grade_point * credit_hours
+			total_credit_hours += pStudent->pCourses[i]->credit_hours;
 		}
 	}
 
 	return total_quality_points / total_credit_hours;
 }
 
-float get_student_cgpa(Student student) {
+float get_student_cgpa(Student* pStudent) {
 	/* Calculates cgpa of a student */
 	float total_quality_points = 0;
 	int total_credit_hours = 0;
 
-	for (int i = 0; i < student.number_of_courses; i++) {
-		total_quality_points += get_grade_point(student.courses[i].grade) * student.courses[i].credit_hours;  // grade_point * credit_hours
-		total_credit_hours += student.courses[i].credit_hours;
+	for (int i = 0; i < pStudent->number_of_courses; i++) {
+		total_quality_points += get_grade_point(pStudent->pCourses[i]->grade) * pStudent->pCourses[i]->credit_hours;  // grade_point * credit_hours
+		total_credit_hours += pStudent->pCourses[i]->credit_hours;
 	}
 
 	return total_quality_points / total_credit_hours;
