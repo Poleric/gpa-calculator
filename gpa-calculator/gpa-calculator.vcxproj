@@ -20,16 +20,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dep\sqlite3.c" />
+    <ClCompile Include="admin.c" />
     <ClCompile Include="calculation.c" />
     <ClCompile Include="db.c" />
-    <ClCompile Include="test.c" />
     <ClCompile Include="student.c" />
+    <ClCompile Include="test.c" />
+    <ClCompile Include="utils.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\dep\admin.h" />
     <ClInclude Include="..\dep\calculation.h" />
     <ClInclude Include="..\dep\db.h" />
     <ClInclude Include="..\dep\sqlite3.h" />
     <ClInclude Include="..\dep\student.h" />
+    <ClInclude Include="..\dep\utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
