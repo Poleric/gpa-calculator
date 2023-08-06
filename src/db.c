@@ -35,10 +35,10 @@ int init_db(sqlite3* db) {
 	if (ret != SQLITE_OK) {
 		fprintf(stderr, "init_db: SQL error: %s\n", exc);
 		sqlite3_free(exc);
-		return -1;
+		return EXIT_FAILURE;
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int store_student(sqlite3* db, Student* pStudent) {
@@ -56,7 +56,7 @@ int store_student(sqlite3* db, Student* pStudent) {
 
 	if (ret != SQLITE_OK) {
 		fprintf(stderr, "store_student: Failed to execute statement: %s\n", sqlite3_errmsg(db));
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	// bind is one-indexed, retrieving data (ie, sqlite_column) is zero-indexed
@@ -66,7 +66,7 @@ int store_student(sqlite3* db, Student* pStudent) {
 	sqlite3_step(stmt);
 	sqlite3_finalize(stmt);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int store_student_courses(sqlite3* db, Student* pStudent) {
@@ -84,7 +84,7 @@ int store_student_courses(sqlite3* db, Student* pStudent) {
 
 	if (ret != SQLITE_OK) {
 		fprintf(stderr, "store_student_courses: Failed to execute statement: %s\n", sqlite3_errmsg(db));
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	for (int i = 0; i < pStudent->number_of_courses; i++) {
@@ -99,7 +99,7 @@ int store_student_courses(sqlite3* db, Student* pStudent) {
 	}
 
 	sqlite3_finalize(stmt);
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int get_number_of_courses(sqlite3* db, char* stud_id) {
@@ -149,7 +149,7 @@ int get_student_courses(sqlite3* db, char* stud_id, Course** buff) {
 
 	if (ret != SQLITE_OK) {
 		fprintf(stderr, "get_student_courses: Failed to execute statement: %s\n", sqlite3_errmsg(db));
-		return -1;
+		return EXIT_FAILURE;
 	};
 
 	sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
@@ -165,7 +165,7 @@ int get_student_courses(sqlite3* db, char* stud_id, Course** buff) {
 		pCourse = malloc(sizeof(Course));
 		if (pCourse == NULL) {
 			fprintf(stderr, "get_student_courses: Allocation error when allocating Course pointer. Possible Out of Memory.");
-			return -1;
+			return EXIT_FAILURE;
 		};
 
 		// duplicating string because pointer is destroyed after sql_finalize
@@ -176,7 +176,7 @@ int get_student_courses(sqlite3* db, char* stud_id, Course** buff) {
 		// handling allocation failure
 		if ((course_code == NULL) || (grade == NULL)) {  // allocation failure, will NOT return Student
 			fprintf(stderr, "get_student_courses: Allocation error when duplicating course_code and grade. Possible Out of Memory.");
-			return -1;
+			return EXIT_FAILURE;
 		};
 
 		// initialize Course
@@ -189,20 +189,21 @@ int get_student_courses(sqlite3* db, char* stud_id, Course** buff) {
 	};
 
 	sqlite3_finalize(stmt);
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 Student* get_student(sqlite3* db, char* stud_id) {
-	/* Get Student with their student_id from `students` table 
+	/* Get Student with their student_id from `students` table.
+	Returns NULL if error.
 	
-	Remember to free Student.courses array.
+	Remember to free Student when getting it using this function.
 	*/
 	sqlite3_stmt* stmt;
 	Student* pStudent = malloc(sizeof(Student));
 
 	if (pStudent == NULL) {
 		fprintf(stderr, "get_student: Allocation error when allocating for student pointer. Possible Out of Memory.");
-		return;
+		return NULL;
 	}
 
 	int ret = sqlite3_prepare_v2(
@@ -215,7 +216,7 @@ Student* get_student(sqlite3* db, char* stud_id) {
 
 	if (ret != SQLITE_OK) {
 		fprintf(stderr, "get_student: Failed to execute statement: %s\n", sqlite3_errmsg(db));
-		return;
+		return NULL;
 	};
 	
 	sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
@@ -233,12 +234,12 @@ Student* get_student(sqlite3* db, char* stud_id) {
 		// checking allocation
 		if (pCourses == NULL) {
 			fprintf(stderr, "get_student: Allocation error when allocating courses buffer. Possible Out of Memory.");
-			return;
+			return NULL;
 		}
 
 		if (get_student_courses(db, stud_id, pCourses) == -1) {  // if error
 			fprintf(stderr, "get_student: Courses cannot be loaded. Exiting the function");
-			return;
+			return NULL;
 		};
 
 		// duplicating string because pointer is destroyed after sql_finalize
@@ -249,7 +250,7 @@ Student* get_student(sqlite3* db, char* stud_id) {
 		// handling allocation failure
 		if ((student_id == NULL) || (student_name == NULL)) {  // allocation failure, will NOT return Student
 			fprintf(stderr, "get_student: Allocation error when duplicating student_id and name. Possible Out of Memory.");
-			return;
+			return NULL;
 		};
 
 		// constructing Student
@@ -263,7 +264,7 @@ Student* get_student(sqlite3* db, char* stud_id) {
 	};
 
 	sqlite3_finalize(stmt);
-	return -1;
+	return NULL;
 }
 
 // alias
@@ -287,7 +288,7 @@ int update_student_courses(sqlite3* db, Student* pStudent) {
 
 	if (ret != SQLITE_OK) {
 		fprintf(stderr, "update_student_courses: Failed to execute statement: %s\n", sqlite3_errmsg(db));
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	for (int i = 0; i < pStudent->number_of_courses; i++) {
@@ -308,7 +309,7 @@ int update_student_courses(sqlite3* db, Student* pStudent) {
 	}
 
 	sqlite3_finalize(stmt);
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 // utils function for freeing memory allocated after finishing
@@ -322,4 +323,6 @@ int free_student(Student *student) {
 	};
 	free(student->pCourses);
 	free(student);
+
+	return EXIT_SUCCESS;
 }
