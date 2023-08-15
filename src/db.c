@@ -1,10 +1,13 @@
 #include <stdio.h>
-#include <string.h>
+#include <string.h>  // strdup
 #include <sqlite3.h>
 #include <student.h>
 #include <db.h>
 #include <stdlib.h>
-#include <string.h>
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
+#define strdup _strdup  //  warning C4996: 'strdup': The POSIX name for this item is deprecated.
+#endif
 
 int init_db(sqlite3* db) {
 	/* Create the tables needed */
@@ -150,7 +153,7 @@ int get_student_courses(sqlite3* db, char* stud_id, Course** buff) {
 	if (ret != SQLITE_OK) {
 		fprintf(stderr, "get_student_courses: Failed to execute statement: %s\n", sqlite3_errmsg(db));
 		return EXIT_FAILURE;
-	};
+	}
 
 	sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
 
@@ -166,18 +169,18 @@ int get_student_courses(sqlite3* db, char* stud_id, Course** buff) {
 		if (pCourse == NULL) {
 			fprintf(stderr, "get_student_courses: Allocation error when allocating Course pointer. Possible Out of Memory.");
 			return EXIT_FAILURE;
-		};
+		}
 
 		// duplicating string because pointer is destroyed after sql_finalize
 		// that also means it need to be freed when not used
-		course_code = _strdup(sqlite3_column_text(stmt, 1));
-		grade = _strdup(sqlite3_column_text(stmt, 4));
+		course_code = strdup(sqlite3_column_text(stmt, 1));
+		grade = strdup(sqlite3_column_text(stmt, 4));
 
 		// handling allocation failure
 		if ((course_code == NULL) || (grade == NULL)) {  // allocation failure, will NOT return Student
 			fprintf(stderr, "get_student_courses: Allocation error when duplicating course_code and grade. Possible Out of Memory.");
 			return EXIT_FAILURE;
-		};
+		}
 
 		// initialize Course
 		pCourse->sql_id = sqlite3_column_int(stmt, 0);  // sql id
@@ -186,7 +189,7 @@ int get_student_courses(sqlite3* db, char* stud_id, Course** buff) {
 		pCourse->credit_hours = sqlite3_column_int(stmt, 3);  // credit_hours
 		pCourse->grade = grade;
 		buff[i] = pCourse;
-	};
+	}
 
 	sqlite3_finalize(stmt);
 	return EXIT_SUCCESS;
@@ -217,7 +220,7 @@ Student* get_student(sqlite3* db, char* stud_id) {
 	if (ret != SQLITE_OK) {
 		fprintf(stderr, "get_student: Failed to execute statement: %s\n", sqlite3_errmsg(db));
 		return NULL;
-	};
+	}
 	
 	sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
 
@@ -237,21 +240,21 @@ Student* get_student(sqlite3* db, char* stud_id) {
 			return NULL;
 		}
 
-		if (get_student_courses(db, stud_id, pCourses) == -1) {  // if error
+		if (get_student_courses(db, stud_id, pCourses) == EXIT_FAILURE) {  // if error
 			fprintf(stderr, "get_student: Courses cannot be loaded. Exiting the function");
 			return NULL;
-		};
+		}
 
 		// duplicating string because pointer is destroyed after sql_finalize
 		// that also means it need to be freed when not used
-		student_id = _strdup(sqlite3_column_text(stmt, 0));
-		student_name = _strdup(sqlite3_column_text(stmt, 1));
+		student_id = strdup(sqlite3_column_text(stmt, 0));
+		student_name = strdup(sqlite3_column_text(stmt, 1));
 
 		// handling allocation failure
 		if ((student_id == NULL) || (student_name == NULL)) {  // allocation failure, will NOT return Student
 			fprintf(stderr, "get_student: Allocation error when duplicating student_id and name. Possible Out of Memory.");
 			return NULL;
-		};
+		}
 
 		// constructing Student
 		pStudent->id = student_id;
@@ -261,7 +264,7 @@ Student* get_student(sqlite3* db, char* stud_id) {
 
 		sqlite3_finalize(stmt);
 		return pStudent;
-	};
+	}
 
 	sqlite3_finalize(stmt);
 	return NULL;
@@ -292,7 +295,7 @@ int update_student_courses(sqlite3* db, Student* pStudent) {
 	}
 
 	for (int i = 0; i < pStudent->number_of_courses; i++) {
-		if (pStudent->pCourses[i]->sql_id != NULL) {
+		if (pStudent->pCourses[i] != NULL) {
 			sqlite3_bind_int(stmt, 1, pStudent->pCourses[i]->sql_id);
 			sqlite3_bind_text(stmt, 2, pStudent->pCourses[i]->course_code, strlen(pStudent->pCourses[i]->course_code), NULL);
 			sqlite3_bind_int(stmt, 3, pStudent->pCourses[i]->sem);
@@ -320,7 +323,7 @@ int free_student(Student *student) {
 	for (int i = 0; i < student->number_of_courses; i++) {
 		free(student->pCourses[i]->course_code);
 		free(student->pCourses[i]->grade);
-	};
+	}
 	free(student->pCourses);
 	free(student);
 

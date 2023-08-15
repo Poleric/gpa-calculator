@@ -7,23 +7,23 @@
 float get_grade_point(char* grade) {
 	/* returns grade point or -1.0 if it doesnt match any.*/
 	if (strcmp(grade, "A") == 0)
-		return 4.0;
+		return 4.0f;
 	else if (strcmp(grade, "A-") == 0)
-		return 3.75;
+		return 3.75f;
 	else if (strcmp(grade, "B+") == 0)
-		return 3.5;
+		return 3.5f;
 	else if (strcmp(grade, "B") == 0)
-		return 3.0;
+		return 3.0f;
 	else if (strcmp(grade, "B-") == 0)
-		return 2.75;
+		return 2.75f;
 	else if (strcmp(grade, "C+") == 0)
-		return 2.5;
+		return 2.5f;
 	else if (strcmp(grade, "C") == 0)
-		return 2.0;
+		return 2.0f;
 	else if (strcmp(grade, "F") == 0)
-		return 0.0;
+		return 0.0f;
 	else
-		return -1.0;
+		return -1.0f;
 }
 
 float get_student_gpa(Student* pStudent, int sem) {
