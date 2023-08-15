@@ -8,8 +8,6 @@ typedef struct Course {
 	unsigned int sem;
 	unsigned int credit_hours;
 	char* grade;
-
-    unsigned int sql_id;
 } Course;
 
 typedef struct Student {
