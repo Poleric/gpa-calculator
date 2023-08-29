@@ -11,7 +11,7 @@ typedef struct Course {
 } Course;
 
 typedef struct Student {
-	char* id;
+	char* student_id;
 	char* name;
 	struct Course** pCourses;
 	unsigned int number_of_courses;  // number of courses over all semesters (to keep track of array size lmao)
