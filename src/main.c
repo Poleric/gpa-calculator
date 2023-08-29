@@ -5,6 +5,7 @@
 #include <utils.h>
 #include <string.h>
 #include <stdlib.h>
+#include <gui.h>
 
 #define LEN(x) sizeof(x)/sizeof(x[0])
 
@@ -55,7 +56,7 @@ int main() {
         printf("course_code=%s sem=%d credit_hours=%d grade=%s\n", stud1.pCourses[i]->course_code, stud1.pCourses[i]->sem, stud1.pCourses[i]->credit_hours, stud1.pCourses[i]->grade);
     };
     // names
-    printf("\nStudent id=%s name=%s\n", stud1.id, stud1.name);
+    printf("\nStudent student_id=%s name=%s\n", stud1.student_id, stud1.name);
     // gpa and cgpa
     printf("\nGPA (sem 2)=%f CGPA=%f\n", get_student_gpa(&stud1, 2), get_student_cgpa(&stud1));
 
@@ -83,10 +84,10 @@ int main() {
 	// printing values
 	// courses enrolled
 	for (int i = 0; i < pSQLStudent->number_of_courses; i++) {
-		printf("sql_id=%d course_code=%s sem=%d credit_hours=%d grade=%s\n", pSQLStudent->pSQLCourses[i]->sql_id, pSQLStudent->pSQLCourses[i]->course_code, pSQLStudent->pSQLCourses[i]->sem, pSQLStudent->pSQLCourses[i]->credit_hours, pSQLStudent->pSQLCourses[i]->grade);
+		printf("row_id=%d course_code=%s sem=%d credit_hours=%d grade=%s\n", pSQLStudent->pSQLCourses[i]->row_id, pSQLStudent->pSQLCourses[i]->course_code, pSQLStudent->pSQLCourses[i]->sem, pSQLStudent->pSQLCourses[i]->credit_hours, pSQLStudent->pSQLCourses[i]->grade);
 	};
 	// names
-	printf("\nStudent id=%s name=%s\n", pSQLStudent->id, pSQLStudent->name);
+    display_students_list(db);
 	// gpa and cgpa
 	printf("\nGPA (sem 2)=%f CGPA=%f\n", get_student_gpa((Student*)pSQLStudent, 2), get_student_cgpa((Student*)pSQLStudent));
 
@@ -108,13 +109,14 @@ int main() {
     // printing values
     // courses enrolled
     for (int i = 0; i < pSQLStudent->number_of_courses; i++) {
-        printf("sql_id=%d course_code=%s sem=%d credit_hours=%d grade=%s\n", pSQLStudent->pSQLCourses[i]->sql_id, pSQLStudent->pSQLCourses[i]->course_code, pSQLStudent->pSQLCourses[i]->sem, pSQLStudent->pSQLCourses[i]->credit_hours, pSQLStudent->pSQLCourses[i]->grade);
+        printf("row_id=%d course_code=%s sem=%d credit_hours=%d grade=%s\n", pSQLStudent->pSQLCourses[i]->row_id, pSQLStudent->pSQLCourses[i]->course_code, pSQLStudent->pSQLCourses[i]->sem, pSQLStudent->pSQLCourses[i]->credit_hours, pSQLStudent->pSQLCourses[i]->grade);
     };
     // names
-    printf("\nStudent id=%s name=%s\n", pSQLStudent->id, pSQLStudent->name);
+    display_students_list(db);
     // gpa and cgpa
     printf("\nGPA (sem 2)=%f CGPA=%f\n", get_student_gpa((Student*)pSQLStudent, 2), get_student_cgpa((Student*)pSQLStudent));
 
+    printf("Number of students = %d", get_number_of_students(db));
 	// cleanup
 	free_student(pSQLStudent);
 	sqlite3_close(db);
