@@ -34,14 +34,6 @@ int update_student_details(sqlite3* db) {
 }
 
 // helper functions
-static inline void clear_screen() {
-    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
-    system("cls");
-    #else
-    system("clear"); // assume POSIX
-    #endif
-}
-
 static inline int truncate_str(char* string, size_t len) {
     string[len] = '\0';
     return EXIT_SUCCESS;

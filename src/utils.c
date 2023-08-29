@@ -2,15 +2,12 @@
 #include <student.h>
 #include <string.h>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
-#define CLEAR "cls"
-#else
-#define CLEAR "clear"  // assume POSIX
-#endif
-
-
-void clear_screen() {
-	system(CLEAR);
+ void clear_screen() {
+    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
+        system("cls");
+    #else
+        system("clear"); // assume POSIX
+    #endif
 }
 
 int is_char_in(char character, const char* character_arr, size_t arr_len) {
@@ -26,6 +23,7 @@ int is_char_in(char character, const char* character_arr, size_t arr_len) {
 }
 
 /* Students related utils */
+
 int filter_sem_courses(int sem, Course** pCourses, size_t courses_len, Course** buff) {
     /* Filters courses from a given semester from an array of Courses. */
 
