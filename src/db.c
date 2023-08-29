@@ -1,9 +1,9 @@
-#include <stdio.h>
+#include <stdio.h>  // fprintf, stderr
 #include <string.h>  // strdup
 #include <sqlite3.h>
-#include <student.h>
+#include <student.h>  // Student, Course
 #include <db.h>
-#include <stdlib.h>
+#include <stdlib.h>  // EXIT_SUCCESS, EXIT_FAILURE
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
 #define strdup _strdup  //  warning C4996: 'strdup': The POSIX name for this item is deprecated.
@@ -17,11 +17,11 @@ int init_db(sqlite3* db) {
 	ret = sqlite3_exec(
 		db,
 		"CREATE TABLE IF NOT EXISTS students ("
-			"student_id VARCHAR(9) PRIMARY KEY,"
+			"student_id VARCHAR(9) NOT NULL UNIQUE,"
 			"student_name TEXT NOT NULL"
 		");"
 		"CREATE TABLE IF NOT EXISTS registered_courses ("
-			"course_id INTEGER PRIMARY KEY,"
+			"rowid INTEGER PRIMARY KEY,"
 			"course_code VARCHAR(7) NOT NULL,"
 			"semester INT NOT NULL,"
 			"credit_hours INT NOT NULL,"
@@ -63,7 +63,7 @@ int store_student(sqlite3* db, Student* pStudent) {
 	}
 
 	// bind is one-indexed, retrieving data (ie, sqlite_column) is zero-indexed
-	sqlite3_bind_text(stmt, 1, pStudent->id, strlen(pStudent->id), NULL);  // (stmt, index, value, bytesize, flag) 
+	sqlite3_bind_text(stmt, 1, pStudent->student_id, strlen(pStudent->student_id), NULL);  // (stmt, index, value, bytesize, flag)
 	sqlite3_bind_text(stmt, 2, pStudent->name, strlen(pStudent->name), NULL);
 
 	sqlite3_step(stmt);
@@ -95,7 +95,7 @@ int store_student_courses(sqlite3* db, Student* pStudent) {
 		sqlite3_bind_int(stmt, 2, pStudent->pCourses[i]->sem);
 		sqlite3_bind_int(stmt, 3, pStudent->pCourses[i]->credit_hours);
 		sqlite3_bind_text(stmt, 4, pStudent->pCourses[i]->grade, strlen(pStudent->pCourses[i]->grade), NULL);
-		sqlite3_bind_text(stmt, 5, pStudent->id, strlen(pStudent->id), NULL);
+		sqlite3_bind_text(stmt, 5, pStudent->student_id, strlen(pStudent->student_id), NULL);
 
 		sqlite3_step(stmt);
 		sqlite3_reset(stmt);
@@ -105,169 +105,75 @@ int store_student_courses(sqlite3* db, Student* pStudent) {
 	return EXIT_SUCCESS;
 }
 
-int get_number_of_courses(sqlite3* db, char* stud_id) {
-	/* get number of course for allocating memory. -1 means error*/
+SQLStudent* get_student(sqlite3* db, char* stud_id) {
+    /* Get Student with their student_id from `students` table.
+    Returns NULL if error.
 
-	sqlite3_stmt* stmt;
-	int number_of_courses = -1;
+    Remember to free Student when getting it using this function.
+    */
 
-	int ret = sqlite3_prepare_v2(
-		db,
-		"SELECT COUNT(*) FROM registered_courses WHERE student_id=?",
-		-1,
-		&stmt,
-		NULL
-	);
+    SQLStudent* pSQLStudent;
+    sqlite3_stmt* stmt = get_students_stmt(db, "WHERE student_id=?");
+    if (stmt == NULL) {
+        fprintf(stderr, "get_student: Failed to allocate memory for stmt\n");
+        return NULL;
+    }
+    sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
 
-	if (ret != SQLITE_OK) {
-		fprintf(stderr, "get_number_of_courses: Failed to execute statement: %s\n", sqlite3_errmsg(db));
-		return -1;
-	}
-	
-	sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
+    // run the sql
+    int ret = sqlite3_step(stmt);
+    if (ret == SQLITE_ROW) {
+        pSQLStudent = build_sql_student_from_stmt(stmt);
+        if (pSQLStudent == NULL) {
+            fprintf(stderr, "get_student: Allocation error when allocating for student pointer. Possible Out of Memory.");
+            return NULL;
+        }
 
-	// run the sql
-	ret = sqlite3_step(stmt);
+        // getting courses
+        int number_of_courses = get_number_of_courses(db, stud_id);
 
-	if (ret == SQLITE_ROW) {
-		number_of_courses = sqlite3_column_int(stmt, 0);
-	}
+        // courses get put into the courses buffer
+        SQLCourse** pSQLCourses = calloc(number_of_courses, sizeof(Course *));
+        // checking allocation
+        if (pSQLCourses == NULL) {
+            fprintf(stderr, "get_student: Allocation error when allocating courses buffer. Possible Out of Memory.");
+            return NULL;
+        }
 
-	sqlite3_finalize(stmt);
-	return number_of_courses;
+        if (get_student_courses(db, stud_id, pSQLCourses, number_of_courses) == EXIT_FAILURE) {  // if error
+            fprintf(stderr, "get_student: Courses cannot be loaded. Exiting the function");
+            return NULL;
+        }
+        pSQLStudent->pSQLCourses = pSQLCourses;
+        pSQLStudent->number_of_courses = number_of_courses;
+        sqlite3_finalize(stmt);
+        return pSQLStudent;
+    }
+    sqlite3_finalize(stmt);
+    return NULL;
 }
 
-int get_student_courses(sqlite3* db, char* stud_id, SQLCourse** buff) {
+int get_student_courses(sqlite3* db, char* stud_id, SQLCourse** buff, size_t buff_len) {
 	/* Get student's Courses with student_id from `registered_courses` table */
-	sqlite3_stmt* stmt;
-	SQLCourse* pSqlCourse;
-	
-	int ret = sqlite3_prepare_v2(
-		db,
-		"SELECT * FROM registered_courses WHERE student_id=?",
-		-1,
-		&stmt,
-		NULL
-	);
+	sqlite3_stmt* stmt = get_student_courses_stmt(db, stud_id);
+    SQLCourse* pSQLCourse;
 
-	if (ret != SQLITE_OK) {
-		fprintf(stderr, "get_student_courses: Failed to execute statement: %s\n", sqlite3_errmsg(db));
-		return EXIT_FAILURE;
-	}
-
-	sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
-
-	char* course_code;
-	char* grade;
 	for (
-		int i = 0, ret = sqlite3_step(stmt);  // 1. run the sql
-		ret == SQLITE_ROW;  // 2. check have result
+		int i = 0, ret = sqlite3_step(stmt);  // 1. run the sql, and assign the return value
+		i < buff_len || ret == SQLITE_ROW;  // 2. break if buffer no space or no more sqlite results
 		i++, ret = sqlite3_step(stmt)  // 3. go next row and continue at 2.
-		) 
+    )
 	{
-        pSqlCourse = malloc(sizeof(SQLCourse));
-		if (pSqlCourse == NULL) {
-			fprintf(stderr, "get_student_courses: Allocation error when allocating Course pointer. Possible Out of Memory.");
-			return EXIT_FAILURE;
-		}
+        pSQLCourse = build_sql_course_from_stmt(stmt);
+        if (pSQLCourse == NULL) {
+            return EXIT_FAILURE;
+        }
 
-		// duplicating string because pointer is destroyed after sql_finalize
-		// that also means it need to be freed when not used
-		course_code = strdup(sqlite3_column_text(stmt, 1));
-		grade = strdup(sqlite3_column_text(stmt, 4));
-
-		// handling allocation failure
-		if ((course_code == NULL) || (grade == NULL)) {  // allocation failure, will NOT return Student
-			fprintf(stderr, "get_student_courses: Allocation error when duplicating course_code and grade. Possible Out of Memory.");
-			return EXIT_FAILURE;
-		}
-
-		// initialize Course
-		pSqlCourse->sql_id = sqlite3_column_int(stmt, 0);  // sql id
-		pSqlCourse->course_code = course_code;
-        pSqlCourse->sem = sqlite3_column_int(stmt, 2);  // sem
-		pSqlCourse->credit_hours = sqlite3_column_int(stmt, 3);  // credit_hours
-		pSqlCourse->grade = grade;
-		buff[i] = pSqlCourse;
+		buff[i] = build_sql_course_from_stmt(stmt);
 	}
 
 	sqlite3_finalize(stmt);
 	return EXIT_SUCCESS;
-}
-
-SQLStudent* get_student(sqlite3* db, char* stud_id) {
-	/* Get Student with their student_id from `students` table.
-	Returns NULL if error.
-	
-	Remember to free Student when getting it using this function.
-	*/
-	sqlite3_stmt* stmt;
-	SQLStudent* pSqlStudent = malloc(sizeof(SQLStudent));
-
-	if (pSqlStudent == NULL) {
-		fprintf(stderr, "get_student: Allocation error when allocating for student pointer. Possible Out of Memory.");
-		return NULL;
-	}
-
-	int ret = sqlite3_prepare_v2(
-		db,
-		"SELECT * FROM students WHERE student_id=?",
-		-1,
-		&stmt,
-		NULL
-	);
-
-	if (ret != SQLITE_OK) {
-		fprintf(stderr, "get_student: Failed to execute statement: %s\n", sqlite3_errmsg(db));
-		return NULL;
-	}
-	
-	sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
-
-	// run the sql
-	ret = sqlite3_step(stmt);
-
-	char* student_id;
-	char* student_name;
-	if (ret == SQLITE_ROW) {
-		int number_of_courses = get_number_of_courses(db, stud_id);
-
-		// courses get put into the courses buffer
-		SQLCourse** pSQLCourses = calloc(number_of_courses, sizeof(Course *));
-		// checking allocation
-		if (pSQLCourses == NULL) {
-			fprintf(stderr, "get_student: Allocation error when allocating courses buffer. Possible Out of Memory.");
-			return NULL;
-		}
-
-		if (get_student_courses(db, stud_id, pSQLCourses) == EXIT_FAILURE) {  // if error
-			fprintf(stderr, "get_student: Courses cannot be loaded. Exiting the function");
-			return NULL;
-		}
-
-		// duplicating string because pointer is destroyed after sql_finalize
-		// that also means it need to be freed when not used
-		student_id = strdup(sqlite3_column_text(stmt, 0));
-		student_name = strdup(sqlite3_column_text(stmt, 1));
-
-		// handling allocation failure
-		if ((student_id == NULL) || (student_name == NULL)) {  // allocation failure, will NOT return Student
-			fprintf(stderr, "get_student: Allocation error when duplicating student_id and name. Possible Out of Memory.");
-			return NULL;
-		}
-
-		// constructing Student
-		pSqlStudent->id = student_id;
-        pSqlStudent->name = student_name;
-        pSqlStudent->pSQLCourses = pSQLCourses;
-        pSqlStudent->number_of_courses = number_of_courses;
-
-		sqlite3_finalize(stmt);
-		return pSqlStudent;
-	}
-
-	sqlite3_finalize(stmt);
-	return NULL;
 }
 
 // alias
@@ -283,31 +189,31 @@ int update_sql_student_courses(sqlite3* db, SQLStudent* pSQLStudent) {
 
 	int ret = sqlite3_prepare(
 		db,
-		"INSERT OR REPLACE INTO registered_courses (course_id, course_code, semester, credit_hours, grade, student_id) VALUES (?, ?, ?, ?, ?, ?);",
+		"INSERT OR REPLACE INTO registered_courses (rowid, course_code, semester, credit_hours, grade, student_id) VALUES (?, ?, ?, ?, ?, ?);",
 		-1,
 		&stmt,
 		NULL
 	);
 
 	if (ret != SQLITE_OK) {
-		fprintf(stderr, "update_student_courses: Failed to execute statement: %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "update_sql_student_courses: Failed to execute statement: %s\n", sqlite3_errmsg(db));
 		return EXIT_FAILURE;
 	}
 
 	for (int i = 0; i < pSQLStudent->number_of_courses; i++) {
 		if (pSQLStudent->pSQLCourses[i] != NULL) {
-			sqlite3_bind_int(stmt, 1, pSQLStudent->pSQLCourses[i]->sql_id);
+			sqlite3_bind_int(stmt, 1, pSQLStudent->pSQLCourses[i]->row_id);
 			sqlite3_bind_text(stmt, 2, pSQLStudent->pSQLCourses[i]->course_code, strlen(pSQLStudent->pSQLCourses[i]->course_code), NULL);
 			sqlite3_bind_int(stmt, 3, pSQLStudent->pSQLCourses[i]->sem);
 			sqlite3_bind_int(stmt, 4, pSQLStudent->pSQLCourses[i]->credit_hours);
 			sqlite3_bind_text(stmt, 5, pSQLStudent->pSQLCourses[i]->grade, strlen(pSQLStudent->pSQLCourses[i]->grade), NULL);
-			sqlite3_bind_text(stmt, 6, pSQLStudent->id, strlen(pSQLStudent->id), NULL);
+			sqlite3_bind_text(stmt, 6, pSQLStudent->student_id, strlen(pSQLStudent->student_id), NULL);
 
 			sqlite3_step(stmt);
 			sqlite3_reset(stmt);
 		}
 		else {
-			fprintf(stderr, "update_student_course: Course %s cannot be updated because sql_id is NULL.", pSQLStudent->pSQLCourses[i]->course_code);
+			fprintf(stderr, "update_student_course: Course %s cannot be updated because rowid is NULL.", pSQLStudent->pSQLCourses[i]->course_code);
 		}
 	}
 
@@ -315,17 +221,221 @@ int update_sql_student_courses(sqlite3* db, SQLStudent* pSQLStudent) {
 	return EXIT_SUCCESS;
 }
 
-// utils function for freeing memory allocated after finishing
+/*
+    Helper functions
+*/
+//sqlite3_stmt select_stmt(sqlite3* db, char* table)
+
+int get_number_of_courses(sqlite3* db, char* stud_id) {
+    /* get number of course for allocating memory. -1 means error*/
+
+    sqlite3_stmt* stmt;
+    int number_of_courses = -1;
+
+    int ret = sqlite3_prepare_v2(
+            db,
+            "SELECT COUNT(*) FROM registered_courses WHERE student_id=?",
+            -1,
+            &stmt,
+            NULL
+    );
+
+    if (ret != SQLITE_OK) {
+        fprintf(stderr, "get_number_of_courses: Failed to execute statement: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+
+    sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
+
+    // run the sql
+    ret = sqlite3_step(stmt);
+
+    if (ret == SQLITE_ROW) {
+        number_of_courses = sqlite3_column_int(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
+    return number_of_courses;
+}
+
+int get_number_of_students(sqlite3* db) {
+    /* get number of students in the database. -1 means error*/
+
+    sqlite3_stmt* stmt;
+    int number_of_students = -1;
+
+    int ret = sqlite3_prepare_v2(
+            db,
+            "SELECT COUNT(*) FROM students",
+            -1,
+            &stmt,
+            NULL
+    );
+
+    if (ret != SQLITE_OK) {
+        fprintf(stderr, "get_number_of_courses: Failed to execute statement: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    // run the sql
+    ret = sqlite3_step(stmt);
+
+    if (ret == SQLITE_ROW) {
+        number_of_students = sqlite3_column_int(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
+    return number_of_students;
+}
+
+sqlite3_stmt* get_students_stmt(sqlite3* db, const char* extra_sql) {
+    /* Low level helper function to get the sql statement to get data from the table students.
+     * Manually bind & step. Free when done.
+     *
+     * Returns NULL when error.
+     */
+
+    sqlite3_stmt* stmt;
+    char* base_cmd = "SELECT * FROM students";
+    char* sql_cmd = malloc(strlen(base_cmd) + (extra_sql != NULL ? strlen(extra_sql) + 2 : 1) + 1);
+
+    // build sql_cmd
+    strcpy(sql_cmd, base_cmd);
+    if (extra_sql != NULL) {
+        strcat(sql_cmd, " ");
+        strcat(sql_cmd, extra_sql);
+    }
+
+    int ret = sqlite3_prepare_v2(
+            db,
+            sql_cmd,
+            -1,
+            &stmt,
+            NULL
+    );
+    free(sql_cmd);
+
+    if (ret != SQLITE_OK) {
+        fprintf(stderr, "get_students_stmt: Failed to execute statement: %s\n", sqlite3_errmsg(db));
+        return NULL;
+    }
+
+    return stmt;
+}
+
+sqlite3_stmt* get_courses_stmt(sqlite3* db, const char* extra_sql) {
+    sqlite3_stmt* stmt;
+    char* base_cmd = "SELECT * FROM registered_courses";
+    char* sql_cmd = malloc(strlen(base_cmd) + (extra_sql != NULL ? strlen(extra_sql) + 2 : 1) + 1);
+
+    // build sql_cmd
+    strcpy(sql_cmd, base_cmd);
+    if (extra_sql != NULL) {
+        strcat(sql_cmd, " ");
+        strcat(sql_cmd, extra_sql);
+    }
+
+    int ret = sqlite3_prepare_v2(
+            db,
+            sql_cmd,
+            -1,
+            &stmt,
+            NULL
+    );
+    free(sql_cmd);
+
+    if (ret != SQLITE_OK) {
+        fprintf(stderr, "get_courses_stmt: Failed to execute statement: %s\n", sqlite3_errmsg(db));
+        return NULL;
+    }
+
+    return stmt;
+}
+
+sqlite3_stmt* get_student_courses_stmt(sqlite3* db, char* stud_id) {
+    /* Low-level function when you want to loop over each value in a sqlite3 statement yourself, and manually free once done with it.
+    Returns NULL when error.
+    */
+    sqlite3_stmt* stmt = get_courses_stmt(db, "WHERE student_id=?");
+    if (stmt == NULL) {
+        fprintf(stderr, "get_student_courses_stmt: Failed to allocate memory for stmt\n");
+        return NULL;
+    }
+
+    sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
+    return stmt;
+}
+
+SQLStudent* build_sql_student_from_stmt(sqlite3_stmt* stmt) {
+    /* Note: The returned SQLStudent only have fields that are retrievable from the get_student stmt, ie only student_id & name. < SQLCourses need to be manually added afterwards > */
+
+    SQLStudent* pSQLStudent = malloc(sizeof(SQLStudent));
+
+    // duplicating string because pointer is destroyed after sql_finalize
+
+    // assigning variable to check memory allocation
+    char* student_id = strdup(sqlite3_column_text(stmt, 0));
+    char* student_name = strdup(sqlite3_column_text(stmt, 1));
+
+    // handling allocation failure
+    if ((student_id == NULL) || (student_name == NULL)) {  // allocation failure, will NOT return Student
+        fprintf(stderr, "get_student: Allocation error when duplicating student_id and name. Possible Out of Memory.");
+        return NULL;
+    }
+
+    // constructing Student
+    pSQLStudent->student_id = student_id;
+    pSQLStudent->name = student_name;
+    return pSQLStudent;
+}
+
+SQLCourse* build_sql_course_from_stmt(sqlite3_stmt* stmt) {
+    SQLCourse* pSQLCourse = malloc(sizeof(SQLCourse));
+    if (pSQLCourse == NULL) {
+        fprintf(stderr, "build_sql_course_from_stmt: Allocation error when allocating SQLCourse pointer. Possible Out of Memory.");
+        return NULL;
+    }
+
+    // duplicating string because pointer is destroyed after sql_finalize
+
+    // assigning variable to check memory allocation
+    char* course_code = strdup(sqlite3_column_text(stmt, 1));
+    char* grade = strdup(sqlite3_column_text(stmt, 4));
+
+    // handling allocation failure
+    if ((course_code == NULL) || (grade == NULL)) {  // allocation failure, will NOT return Student
+        fprintf(stderr, "get_student_courses: Allocation error when duplicating course_code and grade. Possible Out of Memory.");
+        return NULL;
+    }
+
+    // initialize Course
+    pSQLCourse->row_id = sqlite3_column_int(stmt, 0);  // sql student_id
+    pSQLCourse->course_code = course_code;
+    pSQLCourse->sem = sqlite3_column_int(stmt, 2);  // sem
+    pSQLCourse->credit_hours = sqlite3_column_int(stmt, 3);  // credit_hours
+    pSQLCourse->grade = grade;
+    return pSQLCourse;
+}
+
+
+// utils function for freeing memory allocated after finished using it.
 int free_student(SQLStudent *pSQLStudent) {
-	free(pSQLStudent->id);
+    /* frees SQLStudent and its SQLCourses */
+
+	free(pSQLStudent->student_id);
 	free(pSQLStudent->name);
 
 	for (int i = 0; i < pSQLStudent->number_of_courses; i++) {
-		free(pSQLStudent->pSQLCourses[i]->course_code);
-		free(pSQLStudent->pSQLCourses[i]->grade);
+		free_course(pSQLStudent->pSQLCourses[i]);
 	}
 	free(pSQLStudent->pSQLCourses);
 	free(pSQLStudent);
 
 	return EXIT_SUCCESS;
+}
+
+int free_course(SQLCourse *pSQLCourse) {
+    free(pSQLCourse->course_code);
+    free(pSQLCourse->grade);
+    free(pSQLCourse);
+    return EXIT_SUCCESS;
 }
