@@ -9,7 +9,7 @@
 #define strdup _strdup  //  warning C4996: 'strdup': The POSIX name for this item is deprecated.
 #endif
 
-int init_db(sqlite3* db) {
+int init_student_db(sqlite3* db) {
 	/* Create the tables needed */
 
 	char* exc;
@@ -36,7 +36,7 @@ int init_db(sqlite3* db) {
 	);
 
 	if (ret != SQLITE_OK) {
-		fprintf(stderr, "init_db: SQL error: %s\n", exc);
+		fprintf(stderr, "init_student_db: SQL error: %s\n", exc);
 		sqlite3_free(exc);
 		return EXIT_FAILURE;
 	}
@@ -118,7 +118,7 @@ SQLStudent* get_student(sqlite3* db, char* stud_id) {
         fprintf(stderr, "get_student: Failed to allocate memory for stmt\n");
         return NULL;
     }
-    sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
+    sqlite3_bind_text(stmt, 1, stud_id, -1, NULL);
 
     // run the sql
     int ret = sqlite3_step(stmt);
@@ -155,7 +155,8 @@ SQLStudent* get_student(sqlite3* db, char* stud_id) {
 
 int get_student_courses(sqlite3* db, char* stud_id, SQLCourse** buff, size_t buff_len) {
 	/* Get student's Courses with student_id from `registered_courses` table */
-	sqlite3_stmt* stmt = get_student_courses_stmt(db, stud_id);
+	sqlite3_stmt* stmt = get_student_courses_stmt(db);
+    sqlite3_bind_text(stmt, 1, stud_id, -1, NULL);
     SQLCourse* pSQLCourse;
 
 	for (
@@ -168,8 +169,7 @@ int get_student_courses(sqlite3* db, char* stud_id, SQLCourse** buff, size_t buf
         if (pSQLCourse == NULL) {
             return EXIT_FAILURE;
         }
-
-		buff[i] = build_sql_course_from_stmt(stmt);
+		buff[i] = pSQLCourse;
 	}
 
 	sqlite3_finalize(stmt);
@@ -245,7 +245,7 @@ int get_number_of_courses(sqlite3* db, char* stud_id) {
         return -1;
     }
 
-    sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
+    sqlite3_bind_text(stmt, 1, stud_id, -1, NULL);
 
     // run the sql
     ret = sqlite3_step(stmt);
@@ -351,20 +351,6 @@ sqlite3_stmt* get_courses_stmt(sqlite3* db, const char* extra_sql) {
     return stmt;
 }
 
-sqlite3_stmt* get_student_courses_stmt(sqlite3* db, char* stud_id) {
-    /* Low-level function when you want to loop over each value in a sqlite3 statement yourself, and manually free once done with it.
-    Returns NULL when error.
-    */
-    sqlite3_stmt* stmt = get_courses_stmt(db, "WHERE student_id=?");
-    if (stmt == NULL) {
-        fprintf(stderr, "get_student_courses_stmt: Failed to allocate memory for stmt\n");
-        return NULL;
-    }
-
-    sqlite3_bind_text(stmt, 1, stud_id, strlen(stud_id), NULL);
-    return stmt;
-}
-
 SQLStudent* build_sql_student_from_stmt(sqlite3_stmt* stmt) {
     /* Note: The returned SQLStudent only have fields that are retrievable from the get_student stmt, ie only student_id & name. < SQLCourses need to be manually added afterwards > */
 
@@ -379,6 +365,8 @@ SQLStudent* build_sql_student_from_stmt(sqlite3_stmt* stmt) {
     // handling allocation failure
     if ((student_id == NULL) || (student_name == NULL)) {  // allocation failure, will NOT return Student
         fprintf(stderr, "get_student: Allocation error when duplicating student_id and name. Possible Out of Memory.");
+        free(student_id);
+        free(student_name);
         return NULL;
     }
 
@@ -404,6 +392,8 @@ SQLCourse* build_sql_course_from_stmt(sqlite3_stmt* stmt) {
     // handling allocation failure
     if ((course_code == NULL) || (grade == NULL)) {  // allocation failure, will NOT return Student
         fprintf(stderr, "get_student_courses: Allocation error when duplicating course_code and grade. Possible Out of Memory.");
+        free(course_code);
+        free(grade);
         return NULL;
     }
 
@@ -423,14 +413,17 @@ int free_student(SQLStudent *pSQLStudent) {
 
 	free(pSQLStudent->student_id);
 	free(pSQLStudent->name);
-
-	for (int i = 0; i < pSQLStudent->number_of_courses; i++) {
-		free_course(pSQLStudent->pSQLCourses[i]);
-	}
-	free(pSQLStudent->pSQLCourses);
+	free_courses(pSQLStudent->pSQLCourses, (int)pSQLStudent->number_of_courses);
 	free(pSQLStudent);
 
 	return EXIT_SUCCESS;
+}
+
+int free_courses(SQLCourse** pSQLCourses, int number_of_courses) {
+    for (int i = 0; i < number_of_courses; i++) {
+        free_course(pSQLCourses[i]);
+    }
+    free(pSQLCourses);
 }
 
 int free_course(SQLCourse *pSQLCourse) {
