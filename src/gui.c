@@ -9,7 +9,7 @@
 
 #define MINIMUM_NAME_FIELD_LEN 10
 #define MAX_SEM 3
-
+#define DEBUG 1
 
 //int display_students_list(sqlite3* db) {
 //    sqlite3_stmt* stmt = get_students_stmt(db, NULL);
@@ -53,44 +53,56 @@ int admin_menu() {
      */
     init_field_data(&field_data, COLS-2);
     if (field_data.NAME_FIELD_LEN < MINIMUM_NAME_FIELD_LEN) {
-        fprintf(stderr, "Screen too small");  // TODO: Adjust the screen display to accomadate small screen sizes.
+        endwin();
+        fprintf(stderr, "Screen too small. Requires at least %d character wide", field_data.ID_FIELD_LEN + MINIMUM_NAME_FIELD_LEN + field_data.GPA_FIELD_LEN + field_data.CGPA_FIELD_LEN + 3*field_data.FIELD_SEPERATE_LEN);  // TODO: Adjust the screen display to accomadate small screen sizes.
         exit(1);
     }
+
     // write headers
     print_header(&field_data, TRUE);
     refresh();
 
-    stud_list_win = newwin(LINES - 2, COLS, 2, 0);
-    keypad(stud_list_win, TRUE);
-    int input;
-    int selection = 1;
+
     int max_students = get_number_of_students(db);
-    int update = 1;
+    int pad_row = 0, selection = 1;
+    int input;
+    int win_h = LINES - 3, win_w = COLS;
+    int crow, ccol;
+
+    stud_list_win = newpad(max_students, COLS);
+    keypad(stud_list_win, TRUE);
+    write_student_list_window(stud_list_win, db, &field_data);
     do {
-        if (update) {
-
-            wclrtobot(stud_list_win);
-            write_student_list_window(stud_list_win, db, &field_data, selection);
-            wrefresh(stud_list_win);
-            update = 0;
-        }
-
+        getyx(stud_list_win, crow, ccol);
+        prefresh(stud_list_win, pad_row, 0, 2, 0, win_h, win_w);
         input = wgetch(stud_list_win);
         switch(input) {
             case KEY_UP:
+                if (pad_row > 0 && selection <= max_students - win_h + 2) {
+                    pad_row--;
+                }
                 if (selection > 1) {
                     selection--;
-                    update = 1;
+                    wmove(stud_list_win, crow-1, 0);
                 }
                 break;
             case KEY_DOWN:
-                if (selection <= max_students) {
+                if (pad_row <= max_students - win_h)
+                    pad_row++;
+                if (selection < max_students) {
+                    wmove(stud_list_win, crow+1, 0);
                     selection++;
-                    update = 1;
                 }
                 break;
             default:
                 break;
+        }
+
+        if (DEBUG) {
+            mvprintw(0, 0, "%d", pad_row);
+            mvprintw(0, 4, "%d", max_students - win_h);
+            mvprintw(0, 8, "%d", selection);
+            refresh();
         }
     } while (input != 'q');
 
@@ -101,14 +113,9 @@ int admin_menu() {
     return EXIT_SUCCESS;
 }
 
-int write_student_list_window(WINDOW* win, sqlite3* db, FieldData* field_data, int current_row) {
-    int row, col, crow, ccol;  // row, column, current_row, current_column
-    getmaxyx(win, row, col);
-
+int write_student_list_window(WINDOW* win, sqlite3* db, FieldData* field_data) {
     // write list
-    sqlite3_stmt* stmt = get_students_stmt(db, "WHERE rowid>=? LIMIT ?");
-    sqlite3_bind_int(stmt, 1, current_row);
-    sqlite3_bind_int(stmt, 2, row-1);
+    sqlite3_stmt* stmt = get_all_students_stmt(db);
 
     if (can_change_color()) {
         init_pair(1, COLOR_CYAN, COLOR_BLACK);  // selected color
@@ -116,10 +123,11 @@ int write_student_list_window(WINDOW* win, sqlite3* db, FieldData* field_data, i
     } else
         mvwprintw(win, 10, 10, "Cant start Color");
 
+    int crow, ccol;  // current_row, current_column
     for (
-        int i = 0, ret = sqlite3_step(stmt);
-        i < col-1 || ret == SQLITE_ROW;
-        i++, ret = sqlite3_step(stmt), wmove(win, crow+1, 0)
+        int ret = sqlite3_step(stmt);
+        ret == SQLITE_ROW;
+        ret = sqlite3_step(stmt), wmove(win, crow+1, 0)
     )
     {
         getyx(win, crow, ccol);
@@ -175,19 +183,21 @@ int init_field_data(FieldData* field_data, int max_width) {
     field_data->NAME_FIELD_OFFSET = field_data->ID_FIELD_LEN + field_data->FIELD_SEPERATE_LEN;
     field_data->GPA_FIELD_OFFSET = field_data->NAME_FIELD_OFFSET + field_data->NAME_FIELD_LEN + field_data->FIELD_SEPERATE_LEN;
     field_data->CGPA_FIELD_OFFSET = field_data->GPA_FIELD_OFFSET + field_data->GPA_FIELD_LEN + field_data->FIELD_SEPERATE_LEN;
+
+    return EXIT_SUCCESS;
 }
 
-int display_student_info(sqlite3* db) {
-
-}
-
-int input_student_details(sqlite3* db) {
-
-}
-
-int update_student_details(sqlite3* db) {
-
-}
+//int display_student_info(sqlite3* db) {
+//
+//}
+//
+//int input_student_details(sqlite3* db) {
+//
+//}
+//
+//int update_student_details(sqlite3* db) {
+//
+//}
 
 // helper functions
 static inline int truncate_str(char* string, size_t len) {
