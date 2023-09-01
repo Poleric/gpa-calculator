@@ -2,12 +2,17 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include <utils.h>
-#pragma warning(disable:4996)
 
 char* get_day(int day);
 
-void start_admin_screen() {
+
+void clear_screen(){
+	system("cls");
+}
+
+
+
+void main() {
 
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
