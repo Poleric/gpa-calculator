@@ -7,17 +7,17 @@
 
 typedef struct SQLCourse {
     char* course_code;
-    unsigned int sem;
-    unsigned int credit_hours;
+    int sem;
+    int credit_hours;
     char* grade;
-    unsigned int row_id;
+    int row_id;
 } SQLCourse;
 
 typedef struct SQLStudent {
     char* student_id;
     char* name;
     SQLCourse** pSQLCourses;
-    unsigned int number_of_courses;
+    int number_of_courses;
 } SQLStudent;
 
 int init_student_db(sqlite3* db);
