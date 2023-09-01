@@ -287,6 +287,35 @@ int get_number_of_students(sqlite3* db) {
     return number_of_students;
 }
 
+int get_max_sem(sqlite3* db) {
+    /* get the highest semester in the list */
+
+    sqlite3_stmt* stmt;
+    int max_sem = -1;
+
+    int ret = sqlite3_prepare_v2(
+            db,
+            "SELECT MAX(semester) FROM registered_courses",
+            -1,
+            &stmt,
+            NULL
+    );
+
+    if (ret != SQLITE_OK) {
+        fprintf(stderr, "get_max_sem: Failed to execute statement: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+
+    ret = sqlite3_step(stmt);
+
+    if (ret == SQLITE_ROW) {
+        max_sem = sqlite3_column_int(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
+    return max_sem;
+}
+
 sqlite3_stmt* get_students_stmt(sqlite3* db, const char* extra_sql) {
     /* Low level helper function to get the sql statement to get data from the table students.
      * Manually bind & step. Free when done.

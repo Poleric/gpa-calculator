@@ -34,6 +34,7 @@ int update_sql_student_courses(sqlite3* db, SQLStudent* pSQLStudent);
 // helper functions
 int get_number_of_courses(sqlite3* db, char* stud_id);
 int get_number_of_students(sqlite3* db);
+int get_max_sem(sqlite3* db);
 sqlite3_stmt* get_students_stmt(sqlite3* db, const char* extra_sql);
 #define get_all_students_stmt(db) get_students_stmt(db, NULL)
 sqlite3_stmt* get_courses_stmt(sqlite3* db, const char* extra_sql);
