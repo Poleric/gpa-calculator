@@ -15,15 +15,7 @@ void clear_screen(){
 	system("cls");
 }
 
-
-
-void main() {
-
-	time_t t = time(NULL);
-	struct tm tm = *localtime(&t);
-
-	char input[30];
-	int tries = 3;
+int main() {
 	int id;
 
 	printf("          GPA/CGPA CALCULATOR          \n");
@@ -35,16 +27,17 @@ void main() {
 		rewind(stdin);
 		scanf("%i",&id);
 
-	switch(id){
-		case 1:
-			admin();
-			break;
-		case 2:
-			student();
-			break;
-		default:
-		printf("PLEASE CHOOSE THE NUMBER AGAIN: ");
-	}}while(1);
+        switch(id){
+            case 1:
+                admin();
+                break;
+            case 2:
+                student();
+                break;
+            default:
+                printf("PLEASE CHOOSE THE NUMBER AGAIN: ");
+        }
+    } while(id == 1 || id == 2);
 }
 
 void admin (){
@@ -66,7 +59,8 @@ void admin (){
 
 	
 	for(tries = 3; ; tries--){
-		gets(input);
+		fgets(input, sizeof(input)/sizeof(input[0]), stdin);  // gets is removed from C14
+        input[strcspn(input, "\n")] = '\0';  // remove trailing newline from fgets
 		if(strcmp(input,"123456789abc") == 0) {
 			// clear_screen();
 			printf("WELCOME TO THE ADMIN SCREEN");
@@ -126,12 +120,6 @@ void student(){
 	free_student(student);  //free memory
 	sqlite3_close(db);  //close database
 }
-
-
-
-
-
-
 
 char* get_day(int day) {
 
