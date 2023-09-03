@@ -4,7 +4,7 @@
 
 
 float get_grade_point(char* grade) {
-	/* returns grade point or -1.0 if it doesnt match any.*/
+	/* returns grade point or -1.0 if it doesn't match any.*/
 	if (strcmp(grade, "A") == 0)
 		return 4.0f;
 	else if (strcmp(grade, "A-") == 0)
@@ -37,9 +37,9 @@ float get_gpa_from_courses(Course** pCourses, int number_of_courses, int sem) {
     return total_quality_points / total_credit_hours;
 }
 
-int get_gpas_from_courses(Course** pCourses, int number_of_courses, float* buff, int max_semester) {
-    float* total_quality_points = calloc(max_semester, sizeof(float));
-    int* total_credit_hours = calloc(max_semester, sizeof(int));
+void get_gpas_from_courses(Course** pCourses, int number_of_courses, float* buff, int buff_len) {
+    float* total_quality_points = calloc(buff_len, sizeof(float));
+    int* total_credit_hours = calloc(buff_len, sizeof(int));
     for (int i = 0; i < number_of_courses; i++) {
         if (pCourses[i] != NULL) {
             total_quality_points[pCourses[i]->sem - 1] += get_grade_point(pCourses[i]->grade) * pCourses[i]->credit_hours;  // grade_point * credit_hours
@@ -47,12 +47,11 @@ int get_gpas_from_courses(Course** pCourses, int number_of_courses, float* buff,
         }
     }
 
-    for (int sem = 0; sem < max_semester; sem++)
+    for (int sem = 0; sem < buff_len; sem++)
         buff[sem] = total_quality_points[sem] / total_credit_hours[sem];
 
     free(total_quality_points);
     free(total_credit_hours);
-    return EXIT_SUCCESS;
 }
 
 float get_cgpa_from_courses(Course** pCourses, int number_of_courses) {
@@ -65,4 +64,16 @@ float get_cgpa_from_courses(Course** pCourses, int number_of_courses) {
         }
     }
     return total_quality_points / total_credit_hours;
+}
+
+float get_student_gpa(Student* pStudent, int sem) {
+    return get_gpa_from_courses(pStudent->pCourses, pStudent->number_of_courses, sem);
+}
+
+void get_student_gpas(Student* pStudent, float* buff, int buff_len) {
+    return get_gpas_from_courses(pStudent->pCourses, pStudent->number_of_courses, buff, buff_len);
+}
+
+float get_student_cgpa(Student* pStudent) {
+    return get_cgpa_from_courses(pStudent->pCourses, pStudent->number_of_courses);
 }
