@@ -71,7 +71,7 @@ float get_student_gpa(Student* pStudent, int sem) {
 }
 
 void get_student_gpas(Student* pStudent, float* buff, int buff_len) {
-    return get_gpas_from_courses(pStudent->pCourses, pStudent->number_of_courses, buff, buff_len);
+    get_gpas_from_courses(pStudent->pCourses, pStudent->number_of_courses, buff, buff_len);
 }
 
 float get_student_cgpa(Student* pStudent) {
