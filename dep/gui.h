@@ -3,30 +3,41 @@
 #ifndef GPA_CALCULATOR_GUI_H
 #define GPA_CALCULATOR_GUI_H
 
+typedef struct RowData{
+    char *studentID, *studentName;
+    float *gpas;
+    float cgpa;
+} RowData;
+
 typedef struct FieldData {
-    int FIELD_SEPERATE_LEN, ID_FIELD_LEN, GPA_FIELD_LEN, CGPA_FIELD_LEN, NAME_FIELD_LEN;
-    char* ID_FIELD_STRING;
-    char* NAME_FIELD_STRING;
-    char* GPA_FIELD_STRING;
-    char* CGPA_FIELD_STRING;
-    int ID_FIELD_OFFSET, NAME_FIELD_OFFSET, GPA_FIELD_OFFSET, CGPA_FIELD_OFFSET;
+    int fieldSeperateLen, idFieldLen, gpaFieldLen, cgpaFieldLen, nameFieldLen;
+    char *idFieldString, *nameFieldString, *gpaFieldString, *cgpaFieldString;
+    int semCols, width, height;
+    RowData* rows;
+    int number_of_rows;
 } FieldData;
 
-typedef struct StudentListRow {
-    char* student_id;
-    char* student_name;
-    float* gpa;
-    float cgpa;
-} StudentListRow;
-
 int admin_menu();
-int write_student_list_window(WINDOW* win, sqlite3* db, FieldData* field_data);
-int init_field_data(FieldData* field_data, int max_width);
+void write_headers();
+int update_student_list_window(int current_row);
+int write_student_list_window(int current_row);
+int init_field_data(int max_width, int max_height, int max_sem);
+int init_rows(sqlite3* db);
 static inline int truncate_str(char* string, size_t len);
-static inline void wprint_center(WINDOW* win, int width, char* string);
-static inline void print_header(FieldData* field_data, bool standout);
-#define print_center(width, string) wprint_center(stdscr, width, string)
+static inline void wprintw_center(WINDOW* win, int width, char* format, ...);
+static inline void wprintw_header(WINDOW* win, bool standout);
+int free_row(RowData* pRow);
+int free_rows();
 #define center_horizontal(length, field_width) ((int)(field_width - length)/2)
 
+int sort_row(int sort_mode);
+int compare_id(const void * a, const void * b);
+int compare_id_desc(const void * a, const void * b);
+int compare_gpa(const void * a, const void * b);
+int compare_gpa_desc(const void * a, const void * b);
+int compare_cgpa(const void * a, const void * b);
+int compare_cgpa_desc(const void * a, const void * b);
+int compare_name(const void * a, const void * b);
+int compare_name_desc(const void * a, const void * b);
 
 #endif //GPA_CALCULATOR_GUI_H
