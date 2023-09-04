@@ -2,11 +2,9 @@ cmake_minimum_required(VERSION 3.12)
 
 project(gpa-calculator)
 set(CMAKE_BUILD_TYPE Debug)
-find_package(Curses REQUIRED)
 
 # Include headers
-include_directories(./dep/)
-include_directories(${CURSES_INCLUDE_DIRS})
+include_directories(dep)
 
 set(SOURCES
         ./src/sqlite3.c
@@ -15,6 +13,15 @@ set(SOURCES
         ./src/utils.c
         ./src/gui.c
 )
-
 add_executable(gpa-calculator ${SOURCES})
-target_link_libraries(gpa-calculator ${CURSES_LIBRARIES})
+
+# Use PDCurses if WIN else ncurses
+if(WIN32 OR MSVC)
+        find_package(unofficial-pdcurses CONFIG REQUIRED)
+        target_link_libraries(gpa-calculator PRIVATE unofficial::pdcurses::pdcurses)
+else()
+        find_package(Curses REQUIRED)
+        include_directories(${CURSES_INCLUDE_DIRS})
+        target_link_libraries(gpa-calculator PRIVATE ${CURSES_LIBRARIES})
+endif()
+

@@ -7,6 +7,7 @@
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
 #define strdup _strdup  //  warning C4996: 'strdup': The POSIX name for this item is deprecated.
+#define _CRT_SECURE_NO_WARNINGS 1
 #endif
 
 int init_student_db(sqlite3* db) {
@@ -453,6 +454,7 @@ int free_courses(SQLCourse** pSQLCourses, int number_of_courses) {
         free_course(pSQLCourses[i]);
     }
     free(pSQLCourses);
+    return EXIT_SUCCESS;
 }
 
 int free_course(SQLCourse *pSQLCourse) {
