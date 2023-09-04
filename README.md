@@ -1,11 +1,13 @@
 # GPA Calculator
 A GPA calculator and interface written in C.
 
-## Compiling
+## Building
 
-### Windows
+### Linux
 
 Compilation works out of the box on GNU Linux OS.
+
+### Windows
 
 For compiling and building on Windows, it's recommended to use `vcpkg` to manage library, in this case for `pdcurses`.
 
