@@ -9,6 +9,7 @@
 char* get_day(int day);
 void admin ();
 void student ();
+sqlite3* db;
 
 
 void clear_screen(){
@@ -17,6 +18,7 @@ void clear_screen(){
 
 int main() {
 	int id;
+	sqlite3_open("students.db",&db);  //connect database
 
 	printf("          GPA/CGPA CALCULATOR          \n");
 	printf("=======================================\n");
@@ -38,6 +40,8 @@ int main() {
                 printf("PLEASE CHOOSE THE NUMBER AGAIN: ");
         }
     } while(id == 1 || id == 2);
+	
+	sqlite3_close(db);  //close database
 }
 
 void admin (){
@@ -52,7 +56,7 @@ void admin (){
 	printf("==        GPA/CGPA CALCULATOR        ==\n");
 	printf("=======================================\n");
 	printf("ADMINISTRATOR\n");
-	printf("SCHOOL: COLEJ PASAR\n");
+	printf("SCHOOL: KOLEJ PASAR\n");
 	printf("DATE: %s,%d-%02d-%02d\n", get_day(tm.tm_wday), tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 	printf("ENTER THE PASSWORD: ");
 	rewind(stdin);
@@ -93,7 +97,6 @@ void student(){
 	char studentID[100];
 	SQLStudent* student;
 	SQLCourse* course;
-	sqlite3* db;
 
 	printf("=======================================\n");
 	printf("==        GPA/CGPA CALCULATOR        ==\n");
@@ -103,23 +106,51 @@ void student(){
 	printf("DATE: %s,%d-%02d-%02d\n", get_day(tm.tm_wday), tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 	printf("PLEASE ENTER YOUR STUDENT ID: ");
 	scanf("%s",&studentID);  //get student id
-	sqlite3_open("students.db",&db);  //connect database
 	student = get_student(db,studentID);  //read student from database
-	printf("%s\n",student -> name);  //print student name from the database 
-	printf("%s\n",student -> student_id);  //print student id from the database 
 
-	course = student -> pSQLCourses[0];  //read the first course from student
-	printf("%s\n",course ->course_code);  //read course code from first course
-	printf("%i\n",course ->credit_hours);  //read credit hours from course
-	printf("%s\n",course ->grade);  //read grade from course
+	if (student == NULL){
+		printf("You entered a wrong ID");
+		return;
+	}
 
-
-	printf("%f",get_gpa_from_courses((Course**)student -> pSQLCourses,student -> number_of_courses,1));
-
+	printStudentDetails(student);
 
 	free_student(student);  //free memory
-	sqlite3_close(db);  //close database
 }
+
+void printStudentDetails(SQLStudent* student) {
+
+	SQLCourse* course;
+	char no[4];
+
+	printf("Student : %s\n",student -> name);  //print student name from the database 
+	printf("\t     -----------------\n");
+	printf("\t           GRADE      \n");
+	printf("\t     -----------------\n");
+
+	for (int num = 0; num < student -> number_of_courses; num++) {
+
+		course = student -> pSQLCourses[num];  //read the first course from student
+		snprintf(no, 4, "%d.", num+1);
+		printf("\t     %-3s %s > %s\n", no, course ->course_code,course ->grade);  //read course code from first course
+
+	}	
+	printf("\n");
+	printf("\t  ---------   -----------\n");
+	printf("\t     SEM          GPA    \n");
+	printf("\t  ---------   -----------\n");
+
+	for (int sem = 1; sem <= get_max_sem(db); sem++){
+		printf("\t      %d\t\t  %.2f\n", sem, get_student_gpa((Student*)student, sem));
+	}
+	printf("\t\t      -----------\n");
+	printf("\t\t          CGPA   \n");
+	printf("\t\t      -----------\n");
+	printf("\t\t\t  %.2f\n",get_student_cgpa((Student*)student));
+
+}
+
+	
 
 char* get_day(int day) {
 
