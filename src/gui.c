@@ -21,7 +21,7 @@
 #define FIELD_SEPERATE_LEN 2
 
 #define ID_FIELD_LEN 10
-#define MINIMUM_NAME_FIELD_LEN 15
+#define MINIMUM_NAME_FIELD_LEN 12
 #define GPA_FIELD_LEN 8
 #define CGPA_FIELD_LEN 8
 
@@ -30,7 +30,7 @@
 #define GPA_FIELD_STRING _("GPA (S%d)")
 #define CGPA_FIELD_STRING _("CGPA")
 
-#define DEBUG 1
+#define DEBUG 0
 
 // global variables, becoz i need to
 // used by gui functions.
@@ -39,18 +39,25 @@ FieldData field_data;
 
 int sort_gpa;  // only used in compare_gpa
 
-int admin_menu() {
+int student_list_menu() {
     sqlite3* db;
     sqlite3_open("./students.db", &db);
     init_student_db(db);
 
     // ncurses
     initscr();      // start
+    if(has_colors() == FALSE) {
+        endwin();
+        sqlite3_close(db);
+        printf("Your terminal does not support color\n");
+        return EXIT_FAILURE;
+    }
+    start_color();
     cbreak();       // get input for each character
     noecho();       // no display input
 
     int max_sem = get_max_sem(db);
-    init_field_data(COLS, LINES-2, max_sem);
+    init_field_data(COLS, LINES-3, max_sem);
 
     if (field_data.width > COLS) {
         endwin();
@@ -59,26 +66,35 @@ int admin_menu() {
     }
 
     write_headers();
+    write_footer();
     refresh();
 
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);
+    init_pair(2, COLOR_CYAN, COLOR_BLACK);
     int max_students = get_number_of_students(db);
     field_data.rows = calloc(max_students, sizeof(RowData));
     field_data.number_of_rows = max_students;
     init_rows(db);
 
-    int current_row = 0, selection = 1, update = 1;
+    int current_row = 0, selection = 0, selected_row = 0, update = 1;
     int input;
-    int crow, ccol;
     int sort_mode = 1; // 1 - id, 2 - name, 3+ - gpa, ..., cgpa
 
     student_list_win = newwin(field_data.height, field_data.width, 2, 0);
     keypad(student_list_win, TRUE);
+    leaveok(student_list_win, TRUE);
     do {
-        getyx(student_list_win, crow, ccol);
-
         if (update) {
+            wstandout_line(stdscr, 1, 1);
+            standout_sorted_header(sort_mode, 2);
+            refresh();
+
             update_student_list_window(current_row);
+
+            selected_row = current_row < max_students - field_data.height ? 0 : selection - current_row;
+            wstandout_line(student_list_win, selected_row, 2);
             wrefresh(student_list_win);
+            wmove(student_list_win, 0, 0);
             update = 0;
         }
 
@@ -86,21 +102,23 @@ int admin_menu() {
         switch(input) {
             // scroll up and down
             case KEY_UP:
-                if (current_row > 0 && selection <= max_students - field_data.height + 2) {
+                if (current_row > 0 && selection < max_students - field_data.height + 1) {  // magic numbers
                     current_row--;
                     update = 1;
                 }
-                if (selection > 1) {
+                if (selection > 0) {
                     selection--;
+                    update = 1;
                 }
                 break;
             case KEY_DOWN:
-                if (current_row <= max_students - field_data.height) {
+                if (current_row < max_students - field_data.height) {
                     current_row++;
                     update = 1;
                 }
                 if (selection < max_students - 1) {
                     selection++;
+                    update = 1;
                 }
                 break;
             // change sorting option
@@ -118,15 +136,11 @@ int admin_menu() {
                     update = 1;
                 }
                 break;
-//            case KEY_RESIZE:
-//                field_data.height = LINES - 2;
-//                win_w = COLS - 2;
-//
-//                wclrtobot(header_win);
-//                wprintw_header(header_win, &field_data, TRUE);
-//                prefresh(header_win, 0, pad_col, 1, 0, field_data.height, win_w);
-//                init_field_data(&field_data, COLS, max_sem);
-//                write_student_list_window(student_list_pad, db, &field_data);
+            case KEY_ENTER:
+            case '\n':
+                mvprintw(0, 0, "%-20s", field_data.rows[selection].studentName);
+                refresh();
+                break;
             default:
                 break;
         }
@@ -225,8 +239,6 @@ int init_rows(sqlite3* db) {
         i++, ret = sqlite3_step(stmt)
     )
     {
-        mvprintw(4, 4, "%d", i);
-        refresh();
         char* stud_id = strdup((const char*)sqlite3_column_text(stmt, 0));
         if (cannot_alloc(stud_id)) {
             log_alloc_error("get_rows", "stud_id");
@@ -300,6 +312,10 @@ void write_headers() {
     wprintw_header(stdscr, TRUE);
 }
 
+void write_footer() {
+    wprintw_footer(stdscr, TRUE);
+}
+
 static inline void wprintw_center(WINDOW* win, int width, char* format, ...) {
     va_list arglist;
     va_start(arglist, format);
@@ -313,11 +329,11 @@ static inline void wprintw_center(WINDOW* win, int width, char* format, ...) {
 static inline void wprintw_header(WINDOW* win, bool standout) {
     int crow, ccol;
     getyx(win, crow, ccol);
-    wprintw(win, field_data.idFieldString);
+    wprintw(win, "%s", field_data.idFieldString);
     wmove(win, crow, ccol + field_data.idFieldLen + field_data.fieldSeperateLen);
 
     getyx(win, crow, ccol);
-    wprintw(win, field_data.nameFieldString);
+    wprintw(win, "%s", field_data.nameFieldString);
     wmove(win, crow, ccol + field_data.nameFieldLen + field_data.fieldSeperateLen);
 
     for (int i = 1; i <= field_data.semCols; i++) {
@@ -330,7 +346,46 @@ static inline void wprintw_header(WINDOW* win, bool standout) {
     wprintw_center(win, field_data.cgpaFieldLen, field_data.cgpaFieldString);
     wmove(win, crow, ccol + field_data.gpaFieldLen + field_data.fieldSeperateLen);
     if (standout)
-        mvwchgat(win, crow, 0, -1, A_STANDOUT, 0, NULL);  // highlight header
+        wstandout_line(win, crow, 0);
+}
+
+static inline void wstandout_line(WINDOW* win, int row, int color_pair) {
+    mvwchgat(win, row, 0, -1, A_STANDOUT, color_pair, NULL);  // highlight header
+}
+
+void standout_sorted_header(int sort_mode, int color_pair) {
+    int start = 0, end = 0;
+    if (sort_mode >= 1)
+        end += field_data.idFieldLen;
+    if (sort_mode >= 2) {
+        end += field_data.fieldSeperateLen;
+        start = end;
+        end += field_data.nameFieldLen;
+    }
+    if (sort_mode >= 3) {
+        for (int i = 3; i <= sort_mode && i < 3 + field_data.semCols; i++) {
+            end += field_data.fieldSeperateLen;
+            start = end;
+            end += field_data.gpaFieldLen;
+        }
+    }
+    if (sort_mode >= 3 + field_data.semCols) {
+        end += field_data.fieldSeperateLen;
+        start = end;
+        end += field_data.cgpaFieldLen;
+    }
+    mvwchgat(stdscr, 1, start, end-start, A_STANDOUT, color_pair, NULL);
+}
+
+static inline void wprintw_footer(WINDOW* win, bool standout) {
+    int y, x;
+    getmaxyx(win, y, x);
+
+    y--;
+    wmove(win, y, 2);
+    wprintw(win, "[q] %s\t[Enter] %s", _("Quit"), _("View Details"));
+    if (standout)
+        wstandout_line(win, y, 0);  // other color pair dont work for some reason
 }
 
 int compare_id(const void * a, const void * b) {
@@ -412,5 +467,5 @@ int free_rows() {
 }
 
 int main() {
-    admin_menu();
+    student_list_menu();
 }
