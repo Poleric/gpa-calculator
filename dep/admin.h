@@ -1,8 +1,12 @@
 #pragma once
+#include <db.h>
 
 #ifndef ADMIN_H
 #define ADMIN_H
 
-int start_admin_screen();
+void admin();
+void student();
+
+void printStudentDetails(SQLStudent* student);
 
 #endif
