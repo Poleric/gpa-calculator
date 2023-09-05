@@ -30,7 +30,7 @@
 #define GPA_FIELD_STRING _("GPA (S%d)")
 #define CGPA_FIELD_STRING _("CGPA")
 
-#define DEBUG 1
+#define DEBUG 0
 
 // global variables, becoz i need to
 // used by gui functions.
@@ -76,7 +76,7 @@ int student_list_menu() {
     field_data.number_of_rows = max_students;
     init_rows(db);
 
-    int current_row = 0, selection = 1, update = 1;
+    int current_row = 0, selection = 0, selected_row = 0, update = 1;
     int input;
     int sort_mode = 1; // 1 - id, 2 - name, 3+ - gpa, ..., cgpa
 
@@ -91,8 +91,7 @@ int student_list_menu() {
 
             update_student_list_window(current_row);
 
-            int selected_row = current_row < max_students - field_data.height ? 0 : selection - current_row;
-//            mvwprintw(student_list_win, selected_row, 0, ">");
+            selected_row = current_row < max_students - field_data.height ? 0 : selection - current_row;
             wstandout_line(student_list_win, selected_row, 2);
             wrefresh(student_list_win);
             wmove(student_list_win, 0, 0);
@@ -103,11 +102,11 @@ int student_list_menu() {
         switch(input) {
             // scroll up and down
             case KEY_UP:
-                if (current_row > 0 && selection < max_students - field_data.height) {  // magic numbers
+                if (current_row > 0 && selection < max_students - field_data.height + 1) {  // magic numbers
                     current_row--;
                     update = 1;
                 }
-                if (selection > 1) {
+                if (selection > 0) {
                     selection--;
                     update = 1;
                 }
@@ -137,15 +136,11 @@ int student_list_menu() {
                     update = 1;
                 }
                 break;
-//            case KEY_RESIZE:
-//                field_data.height = LINES - 2;
-//                win_w = COLS - 2;
-//
-//                wclrtobot(header_win);
-//                wprintw_header(header_win, &field_data, TRUE);
-//                prefresh(header_win, 0, pad_col, 1, 0, field_data.height, win_w);
-//                init_field_data(&field_data, COLS, max_sem);
-//                write_student_list_window(student_list_pad, db, &field_data);
+            case KEY_ENTER:
+            case '\n':
+                mvprintw(0, 0, "%-20s", field_data.rows[selection].studentName);
+                refresh();
+                break;
             default:
                 break;
         }
@@ -189,7 +184,6 @@ int write_student_list_window(int current_row) {
 
         // print student_id
         getyx(student_list_win, crow, ccol);
-//        waddch(student_list_win, ' ');
         wprintw(student_list_win, "%s", row.studentID);
         wmove(student_list_win, crow, ccol + field_data.idFieldLen + field_data.fieldSeperateLen);
 
