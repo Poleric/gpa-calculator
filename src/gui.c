@@ -28,20 +28,12 @@
 #define GPA_FIELD_STRING _("GPA (S%d)")
 #define CGPA_FIELD_STRING _("CGPA")
 
-#define DEBUG 0
-
-// global variables, becoz i need to
 // used by gui functions.
 WINDOW* student_list_win;
 FieldData field_data;
-
 int sort_gpa;  // only used in compare_gpa
 
-int student_list_menu() {
-    sqlite3* db;
-    sqlite3_open("./students.db", &db);
-    init_student_db(db);
-
+int student_list_menu(sqlite3* db) {
     // ncurses
     initscr();      // start
     if(has_colors() == FALSE) {
@@ -74,7 +66,7 @@ int student_list_menu() {
     field_data.number_of_rows = max_students;
     init_rows(db);
 
-    int current_row = 0, selection = 0, selected_row = 0, update = 1;
+    int current_row = 0, selection = 0, update = 1;
     int input;
     int sort_mode = 1; // 1 - id, 2 - name, 3+ - gpa, ..., cgpa
 
@@ -89,9 +81,10 @@ int student_list_menu() {
 
             update_student_list_window(current_row);
 
-            selected_row = current_row < max_students - field_data.height ? 0 : selection - current_row;
+            int selected_row = current_row < max_students - field_data.height ? 0 : selection - current_row;
             wstandout_line(student_list_win, selected_row, 2);
             wrefresh(student_list_win);
+
             wmove(student_list_win, 0, 0);
             update = 0;
         }
@@ -136,30 +129,24 @@ int student_list_menu() {
                 break;
             case KEY_ENTER:
             case '\n':
-                mvprintw(0, 0, "%-20s", field_data.rows[selection].studentName);
+                def_prog_mode();
+                endwin();
+
+                SQLStudent* stud = get_student(db, field_data.rows[selection].studentID);
+                printStudentDetails(stud);
+                free_student(stud);
+                getchar();
+
+                reset_prog_mode();
                 refresh();
                 break;
             default:
                 break;
         }
-
-        if (DEBUG) {
-            mvprintw(0, 0, "%d", current_row);
-            mvprintw(0, 10, "%d", max_students - field_data.height);
-            mvprintw(0, 15, "%d", selection);
-
-
-            mvprintw(0, 50, "%d", field_data.width);
-            mvprintw(0, 55, "%d", field_data.height);
-
-            mvprintw(0,70, "%d", sort_mode);
-            refresh();
-        }
     } while (input != 'q');
     free_rows();
     wclear(student_list_win); clear();
-    delwin(student_list_win);
-    endwin();
+    delwin(student_list_win); endwin();
     sqlite3_close(db);
     return EXIT_SUCCESS;
 }
@@ -462,8 +449,4 @@ int free_rows() {
         free_row(&field_data.rows[i]);
     free(field_data.rows);
     return EXIT_SUCCESS;
-}
-
-int main() {
-    student_list_menu();
 }
