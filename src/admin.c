@@ -1,56 +1,56 @@
-#include <stdio.h>	
-#include <stdlib.h>
+//#include <gui.h>
 #include <time.h>
 #include <string.h>
-#include <db.h>
 #include <calculation.h>
-#include <student.h>
+#include <utils.h>
+#include <admin.h>
 
-char* get_day(int day);
-void admin ();
-void student ();
+#define EXIT_FLAG (-1)
+
 sqlite3* db;
 
-
-void clear_screen(){
-	system("cls");
-}
-
 int main() {
-	int id;
+	int id, exit = 0;
 	sqlite3_open("students.db",&db);  //connect database
+    init_student_db(db);
 
-	printf("          GPA/CGPA CALCULATOR          \n");
-	printf("=======================================\n");
-	printf("ADMIN ENTER 1\n");
-	printf("STUDENT ENTER 2\n");
-	printf("ENTER AS ADMIN/STUDENT : ");
-	do{
-		rewind(stdin);
-		scanf("%i",&id);
+    do {
+        printf("          GPA/CGPA CALCULATOR          \n");
+        printf("=======================================\n");
+        printf("ADMIN ENTER 1\n");
+        printf("STUDENT ENTER 2\n");
+        printf("EXIT ENTER %d\n", EXIT_FLAG);
+        printf("ENTER AS ADMIN/STUDENT : ");
+        do {
+            rewind(stdin);
+            scanf("%d", &id);
 
-        switch(id){
-            case 1:
-                admin();
-                break;
-            case 2:
-                student();
-                break;
-            default:
-                printf("PLEASE CHOOSE THE NUMBER AGAIN: ");
-        }
-    } while(id == 1 || id == 2);
-	
+            switch (id) {
+                case EXIT_FLAG:
+                    exit = 1;
+                    break;
+                case 1:
+                    admin();
+                    break;
+                case 2:
+                    student();
+                    break;
+                default:
+                    printf("PLEASE CHOOSE THE NUMBER AGAIN: ");
+                    id = 0;
+            }
+        } while (!id);  // id != 0
+    } while(!exit);
+
 	sqlite3_close(db);  //close database
 }
 
-void admin (){
+void admin(){
 
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
 
 	char input[30];
-	int tries = 3;
 
 	printf("=======================================\n");
 	printf("==        GPA/CGPA CALCULATOR        ==\n");
@@ -62,7 +62,7 @@ void admin (){
 	rewind(stdin);
 
 	
-	for(tries = 3; ; tries--){
+	for(int tries = 3; ; tries--){
 		fgets(input, sizeof(input)/sizeof(input[0]), stdin);  // gets is removed from C14
         input[strcspn(input, "\n")] = '\0';  // remove trailing newline from fgets
 		if(strcmp(input,"123456789abc") == 0) {
@@ -83,7 +83,7 @@ void admin (){
 			printf("OR send us a email:ColejPasarService@gmail.com\n");
 			printf("--------------------------------------------------------------------------------\n");
 			printf("\n");
-			break;
+            return;
 		}
     }
 
@@ -96,7 +96,6 @@ void student(){
 
 	char studentID[100];
 	SQLStudent* student;
-	SQLCourse* course;
 
 	printf("=======================================\n");
 	printf("==        GPA/CGPA CALCULATOR        ==\n");
