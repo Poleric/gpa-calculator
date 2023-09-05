@@ -1,5 +1,4 @@
-#include <stdlib.h>
-#include <student.h>
+#include <utils.h>
 #include <string.h>
 
  void clear_screen() {
@@ -10,16 +9,37 @@
     #endif
 }
 
-int is_char_in(char character, const char* character_arr, size_t arr_len) {
+int is_char_in(char character, const char* string, size_t arr_len) {
 	/* Returns 0 if character is in the array, returns -1 if otherwise.
 	Based on python `in` keyword
 	*/
 
 	for (int i = 0; i < arr_len; i++) {
-		if (character == character_arr[i])
+		if (character == string[i])
 			return 0;
 	}
 	return -1;
+}
+
+char* get_day(int day) {
+    switch (day) {
+        case 0:
+            return "MONDAY";
+        case 1:
+            return "TUESDAY";
+        case 2:
+            return "WEDNESDAY";
+        case 3:
+            return "THURSDAY";
+        case 4:
+            return "FRIDAY";
+        case 5:
+            return "SATURDAY";
+        case 6:
+            return "SUNDAY";
+        default:
+            return "INVALID DAY";
+    }
 }
 
 /* Students related utils */
