@@ -1,22 +1,20 @@
 #include <stdlib.h>
 #include <db.h>
-#include <sqlite3.h>
-#include <gui.h>
 #include <string.h>
 #include <calculation.h>
-#include <stdarg.h>
 #include <utils.h>
+#include <stdarg.h>
+#include <admin.h>
+#include <gui.h>
+
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
 #define strdup _strdup  //  warning C4996: 'strdup': The POSIX name for this item is deprecated.
-#include <curses.h>
 #define _(String) String
 #else
-#include <ncurses.h>
 #include <libintl.h>
 #define _(String) gettext(String)
 #endif
-
 
 #define FIELD_SEPERATE_LEN 2
 
