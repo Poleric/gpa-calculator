@@ -7,6 +7,8 @@
 #define UTILS_H
 
 void clear_screen();
+void flush_stdin();
+void pause();
 int is_char_in(char character, const char* string, size_t arr_len);
 char* get_day(int day);
 

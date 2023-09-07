@@ -9,6 +9,24 @@
     #endif
 }
 
+void flush_stdin() {
+    /* rewind(stdin) or fflush(stdin) not working on my machine */
+    int c;
+    while((c = getchar()) != '\n' && c != EOF);
+}
+
+void pause() {
+    /* cross platform solution to system("pause") lmao. */
+
+    flush_stdin();
+
+    putchar('\n');
+    printf("Press ENTER to proceed");
+    putchar('\n');
+
+    getchar();
+}
+
 int is_char_in(char character, const char* string, size_t arr_len) {
 	/* Returns 0 if character is in the array, returns -1 if otherwise.
 	Based on python `in` keyword
