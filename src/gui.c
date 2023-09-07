@@ -55,8 +55,12 @@ int student_list_menu(sqlite3* db) {
         return EXIT_FAILURE;
     }
 
-    write_headers();
-    write_footer();
+
+    wprintw_center(stdscr, COLS, "Kolej Pasar Students");
+    move(1, 0);        // print table header below title
+    wprintw_header(stdscr, TRUE);
+    move(LINES-1, 2);  // print footer at the bottom, move right 2
+    wprintw_footer(stdscr, TRUE);
     refresh();
 
     init_pair(1, COLOR_GREEN, COLOR_BLACK);
@@ -147,7 +151,6 @@ int student_list_menu(sqlite3* db) {
     free_rows();
     wclear(student_list_win); clear();
     delwin(student_list_win); endwin();
-    sqlite3_close(db);
     return EXIT_SUCCESS;
 }
 
@@ -291,16 +294,6 @@ static inline int truncate_str(char* string, size_t len) {
     return EXIT_SUCCESS;
 }
 
-void write_headers() {
-    wprintw_center(stdscr, COLS, "Kolej Pasar Students");
-    move(1, 0);
-    wprintw_header(stdscr, TRUE);
-}
-
-void write_footer() {
-    wprintw_footer(stdscr, TRUE);
-}
-
 static inline void wprintw_center(WINDOW* win, int width, char* format, ...) {
     va_list arglist;
     va_start(arglist, format);
@@ -334,6 +327,15 @@ static inline void wprintw_header(WINDOW* win, bool standout) {
         wstandout_line(win, crow, 0);
 }
 
+static inline void wprintw_footer(WINDOW* win, bool standout) {
+    int crow, ccol;
+    getmaxyx(win, crow, ccol);
+
+    wprintw(win, "[q] %s\t[Enter] %s", _("Quit"), _("View Details"));
+    if (standout)
+        wstandout_line(win, crow, 0);  // other color pair dont work for some reason
+}
+
 static inline void wstandout_line(WINDOW* win, int row, int color_pair) {
     mvwchgat(win, row, 0, -1, A_STANDOUT, color_pair, NULL);  // highlight header
 }
@@ -360,17 +362,6 @@ void standout_sorted_header(int sort_mode, int color_pair) {
         end += field_data.cgpaFieldLen;
     }
     mvwchgat(stdscr, 1, start, end-start, A_STANDOUT, color_pair, NULL);
-}
-
-static inline void wprintw_footer(WINDOW* win, bool standout) {
-    int y, x;
-    getmaxyx(win, y, x);
-
-    y--;
-    wmove(win, y, 2);
-    wprintw(win, "[q] %s\t[Enter] %s", _("Quit"), _("View Details"));
-    if (standout)
-        wstandout_line(win, y, 0);  // other color pair dont work for some reason
 }
 
 int compare_id(const void * a, const void * b) {
