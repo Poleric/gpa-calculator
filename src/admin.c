@@ -61,9 +61,8 @@ void admin(){
 	printf("ADMINISTRATOR\n");
 	printf("SCHOOL: KOLEJ PASAR\n");
 	printf("DATE: %s,%d-%02d-%02d\n", get_day(tm.tm_wday), tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
-	switch (admin_login()) {
+	switch (adminLogin()) {
         case EXIT_SUCCESS:  // success login
-            pause();
             break;
         case EXIT_FAILURE:  // fail login
             pause();
@@ -73,12 +72,14 @@ void admin(){
     int exit = 0;
     int option;
 
+    SQLStudent* student = get_student(db, "WBA0000ND");
+
     do {
         clear_screen();
         printf("WELCOME TO THE ADMIN SCREEN\n");
         printf("=======================================\n");
         printf("VIEW STUDENT LIST ENTER 1\n");
-        printf("GET A STUDENT DETAIL ENTER 2\n");
+        printf("GET A STUDENT DETAILS ENTER 2\n");
         printf("STORE STUDENT ENTER 3\n");
         printf("UPDATE STUDENT ENTER 4\n");
         printf("\n");
@@ -86,11 +87,17 @@ void admin(){
         printf("ENTER: ");
         do {
             scanf("%d", &option);
+            flush_stdin();
             switch (option) {
                 case 1:
                     student_list_menu(db);
                     break;
                 case 2:
+                    putchar('\n');
+                    clear_screen();
+                    printFullStudentDetails(student);
+                    pause();
+                    break;
                 case 3:
                 case 4:
                     break;
@@ -100,13 +107,14 @@ void admin(){
                 default:
                     break;
             }
-            flush_stdin();
         } while (!option);  // option == 0
         clear_screen();
     } while (!exit); // exit == 0
+
+    free_student(student);
 }
 
-int admin_login() {
+int adminLogin() {
     char input[30];
 
     printf("ENTER THE PASSWORD: ");
@@ -158,6 +166,7 @@ void student(){
     putchar('\n');
 	printStudentDetails(student);
 	free_student(student);  //free memory
+    flush_stdin();
     pause();
 }
 
@@ -192,5 +201,98 @@ void printStudentDetails(SQLStudent* student) {
 	printf("\t\t          CGPA   \n");
 	printf("\t\t      -----------\n");
 	printf("\t\t\t  %.2f\n",get_student_cgpa((Student*)student));
+}
 
+void printFullStudentDetails(SQLStudent* student) {
+    int max_sem;
+
+    printf("DETAILS:\n");
+    printf("=============================================\n");
+    printf("Student ID: %s\n", student->name);
+   printf("Student Name: %s\n", student->student_id);
+    printf("Total enrolled courses: %d\n", student->number_of_courses);
+
+    max_sem = get_max_sem(db);
+    printStudentCoursesTable(student, max_sem);
+}
+
+void printManyChar(char character, int length) {
+    for (int i = 0; i < length; i++) {
+        putchar(character);
+    }
+}
+
+void printLineWithManyChar(char character, int length) {
+    printManyChar(character, length);
+    putchar('\n');
+}
+
+void printLineWithManyCharWithSeperators(char character, int length, char seperator, int number_of_times, bool trailing_seperator) {
+    for (int i = 0; i < number_of_times; i++) {
+        printManyChar(character, length);
+
+        if (i != number_of_times - 1 + trailing_seperator)  // TRUE cancels out -1
+            putchar(seperator);
+    }
+    putchar('\n');
+}
+
+void printStudentCoursesTable(SQLStudent* student, int max_sem) {
+    const int COLUMN_WIDTH = 15;
+
+    printLineWithManyChar('=', (COLUMN_WIDTH+1)*max_sem);
+
+    for (int sem = 1; sem <= max_sem; sem++) {
+        printf(" Sem %-*d", COLUMN_WIDTH - 5, sem);
+        printf("|");
+    }
+    putchar('\n');
+
+    printLineWithManyCharWithSeperators('-', COLUMN_WIDTH, '|', max_sem, TRUE);
+
+    SQLCourse*** courses_each_sem = calloc(max_sem, sizeof(SQLCourse**));
+    for (int i = 0; i < max_sem; i++) {
+        courses_each_sem[i] = calloc(student->number_of_courses, sizeof(SQLCourse*));
+        filter_sem_courses(i + 1, (Course**)student->pSQLCourses, student->number_of_courses,(Course **) courses_each_sem[i]);
+    }
+    // line 3++
+    for (int row = 0; row < student->number_of_courses; row++) {
+        int stop = 1;
+        for (int sem_index = 0; sem_index < max_sem; sem_index++) {
+            SQLCourse* course = courses_each_sem[sem_index][row];
+            if (course != NULL) {
+                stop = 0;
+                printf(" %s", course->course_code);
+                printf(" > ");
+                printf("%-*s", COLUMN_WIDTH - 5 - (int)strlen(course->course_code), course->grade);
+                printf(" |");
+            } else {
+                printManyChar(' ', COLUMN_WIDTH);
+                putchar('|');
+            }
+        }
+        putchar('\n');
+        if (stop) break;
+    }
+
+    // free alloc
+    for (int i = 0; i < max_sem; i++) {
+        free(courses_each_sem[i]);
+    }
+    free(courses_each_sem);
+
+    printLineWithManyCharWithSeperators('-', COLUMN_WIDTH, '|', max_sem, TRUE);
+
+    for (int sem = 1; sem <= max_sem; sem++) {
+        printf("  GPA: %-*.2f", COLUMN_WIDTH - 7, get_gpa_from_courses((Course**)student->pSQLCourses, student->number_of_courses, sem));
+        printf("|");
+    }
+    putchar('\n');
+
+    printLineWithManyChar('=', (COLUMN_WIDTH+1)*max_sem);
+
+    printf(" CGPA: %-*.2f", COLUMN_WIDTH*max_sem + max_sem - 8, get_cgpa_from_courses((Course**)student->pSQLCourses, student->number_of_courses));
+    printf("|\n");
+
+    printLineWithManyChar('=', (COLUMN_WIDTH+1)*max_sem);
 }
