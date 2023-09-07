@@ -5,6 +5,7 @@
 #define ADMIN_H
 
 void admin();
+int admin_login();
 void student();
 
 void printStudentDetails(SQLStudent* student);
