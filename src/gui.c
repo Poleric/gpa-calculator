@@ -7,7 +7,6 @@
 #include <admin.h>
 #include <gui.h>
 
-
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
 #define strdup _strdup  //  warning C4996: 'strdup': The POSIX name for this item is deprecated.
 #define _(String) String
@@ -136,6 +135,7 @@ int student_list_menu(sqlite3* db) {
                 def_prog_mode();
                 endwin();
 
+                clear_screen();
                 SQLStudent* stud = get_student(db, field_data.rows[selection].studentID);
                 printStudentDetails(stud);
                 free_student(stud);

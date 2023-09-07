@@ -24,7 +24,7 @@ typedef struct FieldData {
     int number_of_rows;
 } FieldData;
 
-int student_list_menu(sqlite3* db);\
+int student_list_menu(sqlite3* db);
 int update_student_list_window(int current_row);
 int write_student_list_window(int current_row);
 int init_field_data(int max_width, int max_height, int max_sem);
