@@ -18,8 +18,6 @@ void flush_stdin() {
 void pause() {
     /* cross platform solution to system("pause") lmao. */
 
-    flush_stdin();
-
     putchar('\n');
     printf("Press ENTER to proceed");
     putchar('\n');
