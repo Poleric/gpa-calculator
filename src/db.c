@@ -3,6 +3,7 @@
 #include <sqlite3.h>
 #include <student.h>  // Student, Course
 #include <db.h>
+#include <utils.h>
 #include <stdlib.h>  // EXIT_SUCCESS, EXIT_FAILURE
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
@@ -116,7 +117,7 @@ SQLStudent* get_student(sqlite3* db, char* stud_id) {
     SQLStudent* pSQLStudent;
     sqlite3_stmt* stmt = get_students_stmt(db, "WHERE student_id=?");
     if (stmt == NULL) {
-        fprintf(stderr, "get_student: Failed to allocate memory for stmt\n");
+        log_alloc_error("get_student", "stmt");
         return NULL;
     }
     sqlite3_bind_text(stmt, 1, stud_id, -1, NULL);
@@ -126,7 +127,7 @@ SQLStudent* get_student(sqlite3* db, char* stud_id) {
     if (ret == SQLITE_ROW) {
         pSQLStudent = build_sql_student_from_stmt(stmt);
         if (pSQLStudent == NULL) {
-            fprintf(stderr, "get_student: Allocation error when allocating for student pointer. Possible Out of Memory.");
+            log_alloc_error("get_student", "pSQLStudent");
             return NULL;
         }
 
@@ -137,7 +138,7 @@ SQLStudent* get_student(sqlite3* db, char* stud_id) {
         SQLCourse** pSQLCourses = calloc(number_of_courses, sizeof(Course *));
         // checking allocation
         if (pSQLCourses == NULL) {
-            fprintf(stderr, "get_student: Allocation error when allocating courses buffer. Possible Out of Memory.");
+            log_alloc_error("get_student", "pSQLCourse");
             return NULL;
         }
 
@@ -390,13 +391,15 @@ SQLStudent* build_sql_student_from_stmt(sqlite3_stmt* stmt) {
 
     // assigning variable to check memory allocation
     char* student_id = strdup(sqlite3_column_text(stmt, 0));
-    char* student_name = strdup(sqlite3_column_text(stmt, 1));
+    if (student_id == NULL) {
+        log_alloc_error("build_sql_student_from_stmt", "student_id");
+        return NULL;
+    }
 
-    // handling allocation failure
-    if ((student_id == NULL) || (student_name == NULL)) {  // allocation failure, will NOT return Student
-        fprintf(stderr, "get_student: Allocation error when duplicating student_id and name. Possible Out of Memory.");
+    char* student_name = strdup(sqlite3_column_text(stmt, 1));
+    if (student_name == NULL) {
+        log_alloc_error("build_sql_student_from_stmt", "student_name");
         free(student_id);
-        free(student_name);
         return NULL;
     }
 
@@ -409,7 +412,7 @@ SQLStudent* build_sql_student_from_stmt(sqlite3_stmt* stmt) {
 SQLCourse* build_sql_course_from_stmt(sqlite3_stmt* stmt) {
     SQLCourse* pSQLCourse = malloc(sizeof(SQLCourse));
     if (pSQLCourse == NULL) {
-        fprintf(stderr, "build_sql_course_from_stmt: Allocation error when allocating SQLCourse pointer. Possible Out of Memory.");
+        log_alloc_error("build_sql_course_from_stmt", "pSQLCourse");
         return NULL;
     }
 
@@ -417,13 +420,15 @@ SQLCourse* build_sql_course_from_stmt(sqlite3_stmt* stmt) {
 
     // assigning variable to check memory allocation
     char* course_code = strdup(sqlite3_column_text(stmt, 1));
-    char* grade = strdup(sqlite3_column_text(stmt, 4));
+    if (course_code == NULL) {
+        log_alloc_error("get_student_courses", "course_code");
+        return NULL;
+    }
 
-    // handling allocation failure
-    if ((course_code == NULL) || (grade == NULL)) {  // allocation failure, will NOT return Student
-        fprintf(stderr, "get_student_courses: Allocation error when duplicating course_code and grade. Possible Out of Memory.");
+    char* grade = strdup(sqlite3_column_text(stmt, 4));
+    if (grade == NULL) {
+        log_alloc_error("build_sql_course_from_stmt", "grade");
         free(course_code);
-        free(grade);
         return NULL;
     }
 

@@ -364,7 +364,7 @@ int init_rows(sqlite3* db) {
         float* gpas = calloc(field_data.semCols, sizeof(float));
 
         if (gpas == NULL) {
-            fprintf(stderr, "get_rows: Allocation error when allocating gpas. Out of memory.");
+            log_alloc_error("init_rows", "gpas");
             free(stud_id);
             free(stud_name);
             return EXIT_FAILURE;
