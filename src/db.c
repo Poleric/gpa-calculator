@@ -64,8 +64,8 @@ int store_student(sqlite3* db, Student* pStudent) {
 	}
 
 	// bind is one-indexed, retrieving data (ie, sqlite_column) is zero-indexed
-	sqlite3_bind_text(stmt, 1, pStudent->student_id, strlen(pStudent->student_id), NULL);  // (stmt, index, value, bytesize, flag)
-	sqlite3_bind_text(stmt, 2, pStudent->name, strlen(pStudent->name), NULL);
+	sqlite3_bind_text(stmt, 1, pStudent->student_id, -1, NULL);  // (stmt, index, value, bytesize, flag)
+	sqlite3_bind_text(stmt, 2, pStudent->name, -1, NULL);
 
 	sqlite3_step(stmt);
 	sqlite3_finalize(stmt);
@@ -92,11 +92,11 @@ int store_student_courses(sqlite3* db, Student* pStudent) {
 	}
 
 	for (int i = 0; i < pStudent->number_of_courses; i++) {
-		sqlite3_bind_text(stmt, 1, pStudent->pCourses[i]->course_code, strlen(pStudent->pCourses[i]->course_code), NULL);
+		sqlite3_bind_text(stmt, 1, pStudent->pCourses[i]->course_code, -1, NULL);
 		sqlite3_bind_int(stmt, 2, pStudent->pCourses[i]->sem);
 		sqlite3_bind_int(stmt, 3, pStudent->pCourses[i]->credit_hours);
-		sqlite3_bind_text(stmt, 4, pStudent->pCourses[i]->grade, strlen(pStudent->pCourses[i]->grade), NULL);
-		sqlite3_bind_text(stmt, 5, pStudent->student_id, strlen(pStudent->student_id), NULL);
+		sqlite3_bind_text(stmt, 4, pStudent->pCourses[i]->grade, -1, NULL);
+		sqlite3_bind_text(stmt, 5, pStudent->student_id, -1, NULL);
 
 		sqlite3_step(stmt);
 		sqlite3_reset(stmt);
