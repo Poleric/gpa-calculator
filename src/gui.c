@@ -38,7 +38,7 @@ int student_list_menu(sqlite3* db) {
     initscr();      // start
     if(has_colors() == FALSE) {
         endwin();
-        printf("Your terminal does not support color\n");
+        printf(_("Your terminal does not support color\n"));
         return EXIT_FAILURE;
     }
     start_color();
@@ -50,12 +50,12 @@ int student_list_menu(sqlite3* db) {
 
     if (field_data.width > COLS) {
         endwin();
-        fprintf(stderr, "Screen is too small, resize to be atleast %d wide.\n", field_data.width);
+        fprintf(stderr, _("Screen is too small, resize to be atleast %d wide.\n"), field_data.width);
         return EXIT_FAILURE;
     }
 
 
-    wprintw_center(stdscr, COLS, "Kolej Pasar Students");
+    wprintw_center(stdscr, COLS, _("Kolej Pasar Students"));
     move(1, 0);        // print table header below title
     wprintw_header(stdscr, TRUE);
     move(LINES-1, 2);  // print footer at the bottom, move right 2
@@ -163,7 +163,7 @@ int insert_student_menu(sqlite3* db) {
     initscr();      // start
     if(has_colors() == FALSE) {
         endwin();
-        printf("Your terminal does not support color\n");
+        printf(_("Your terminal does not support color\n"));
         return EXIT_FAILURE;
     }
     start_color();
@@ -204,7 +204,7 @@ int insert_student_menu(sqlite3* db) {
         if (number_of_courses != 0) {
             move((insertFieldCoords.courseCodeY - 1) + (FIELD_HEIGHT + 1) * number_of_courses, 0);
 
-            wprintw_center(stdscr, COLS - 8, "Do you want to add another course? ");
+            wprintw_center(stdscr, COLS - 8, _("Do you want to add another course? "));
             if (!yes_or_no_selector(stdscr, 1))
                 break;
             wprint_course_insert_field(stdscr, number_of_courses + 1);
@@ -248,7 +248,7 @@ int insert_student_menu(sqlite3* db) {
         courses[number_of_courses-1]->grade = strdup(grade);
     } while (1);
 
-    wprintw_center(stdscr, COLS - 8, "Save record? ");
+    wprintw_center(stdscr, COLS - 8, _("Save record? "));
     if (yes_or_no_selector(stdscr, 1)) {
         student = (Student) {
                 student_id,
