@@ -38,7 +38,6 @@ int student_list_menu(sqlite3* db) {
     initscr();      // start
     if(has_colors() == FALSE) {
         endwin();
-        sqlite3_close(db);
         printf("Your terminal does not support color\n");
         return EXIT_FAILURE;
     }
@@ -138,7 +137,7 @@ int student_list_menu(sqlite3* db) {
 
                 clear_screen();
                 SQLStudent* stud = get_student(db, field_data.rows[selection].studentID);
-                printStudentDetails(stud);
+                printFullStudentDetails(stud);
                 free_student(stud);
                 getchar();
 
@@ -155,9 +154,125 @@ int student_list_menu(sqlite3* db) {
     return EXIT_SUCCESS;
 }
 
-int update_student_list_window(int current_row) {
-    wclrtobot(student_list_win);
-    write_student_list_window(current_row);
+int insert_student_menu(sqlite3* db) {
+    Student student;
+    Course** courses = NULL;
+    InsertFieldCoords insertFieldCoords;
+
+    // ncurses
+    initscr();      // start
+    if(has_colors() == FALSE) {
+        endwin();
+        printf("Your terminal does not support color\n");
+        return EXIT_FAILURE;
+    }
+    start_color();
+    noecho();
+    scrollok(stdscr, TRUE);
+
+    const int N_COLOR = 3;
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);
+    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(3, COLOR_CYAN, COLOR_BLACK);
+
+    wprintw_center(stdscr, COLS, _("Inserting Student"));
+    wstandout_line(stdscr, 0, 0);
+    move(2, 0);
+    wprint_initial_insert_student_menu(stdscr, &insertFieldCoords);
+    refresh();
+
+    echo();
+    char student_id[20], student_name[64];
+    do {
+        move(insertFieldCoords.studentIdY, insertFieldCoords.studentIdX);
+        clrtoeol();
+        getnstr(student_id, ARRAY_SIZE(student_id));
+    } while(student_id[0] == '\0');
+    do {
+        move(insertFieldCoords.studentNameY, insertFieldCoords.studentNameX);
+        clrtoeol();
+        getnstr(student_name, ARRAY_SIZE(student_name));
+    } while(student_name[0] == '\0');
+
+    const int FIELD_HEIGHT = 5;
+    void * tmp;  // for checking alloc ok or not
+
+    // Course info fields
+    char course_code[15], grade[3];
+    int sem, credit_hours, number_of_courses = 0, selection = 0;
+    do {
+        if (number_of_courses != 0) {
+            move((insertFieldCoords.courseCodeY - 1) + (FIELD_HEIGHT + 1) * number_of_courses, 0);
+
+            wprintw_center(stdscr, COLS - 8, "Do you want to add another course? ");
+            if (!yes_or_no_selector(stdscr, 1))
+                move((insertFieldCoords.courseCodeY - 1) + (FIELD_HEIGHT + 1) * number_of_courses, 0);
+                clrtoeol();
+                break;
+            move((insertFieldCoords.courseCodeY - 1) + (FIELD_HEIGHT + 1) * number_of_courses, 0);
+            clrtoeol();
+
+            wprint_course_insert_field(stdscr, number_of_courses + 1);
+        }
+
+        number_of_courses++;
+        tmp = realloc(courses, number_of_courses*sizeof(Course*));
+        if (tmp == NULL) {
+            log_alloc_error("insert_student_name", "courses");
+            free(courses);
+            clear();
+            endwin();
+            return EXIT_FAILURE;
+        }
+        courses = tmp;
+
+        do {
+            move(insertFieldCoords.courseCodeY + (FIELD_HEIGHT + 1) * (number_of_courses - 1), insertFieldCoords.courseCodeX);
+            clrtoeol();
+            getnstr(course_code, ARRAY_SIZE(course_code));
+        } while(course_code[0] == '\0');
+        do {
+            move(insertFieldCoords.semY + (FIELD_HEIGHT + 1) * (number_of_courses - 1), insertFieldCoords.semX);
+            clrtoeol();
+            scanw("%d", &sem);
+        } while(sem <= 0);
+        do {
+            move(insertFieldCoords.creditHoursY + (FIELD_HEIGHT + 1) * (number_of_courses - 1), insertFieldCoords.creditHoursX);
+            clrtoeol();
+            scanw("%d", &credit_hours);
+        } while(credit_hours <= 0);
+        do {
+            move(insertFieldCoords.gradeY + (FIELD_HEIGHT + 1) * (number_of_courses - 1), insertFieldCoords.gradeX);
+            clrtoeol();
+            getnstr(grade, ARRAY_SIZE(grade));
+        } while (!is_valid_grade(grade));
+        courses[number_of_courses-1] = malloc(sizeof(Course));
+        courses[number_of_courses-1]->course_code = course_code;
+        courses[number_of_courses-1]->sem = sem;
+        courses[number_of_courses-1]->credit_hours = credit_hours;
+        courses[number_of_courses-1]->grade = grade;
+    } while (1);
+
+    wprintw_center(stdscr, COLS - 8, "Save record? ");
+    if (yes_or_no_selector(stdscr, 1)) {
+        student = (Student) {
+                student_id,
+                student_name,
+                courses,
+                number_of_courses
+        };
+        store_student(db, &student);
+        store_student_courses(db, &student);
+    }
+
+    for (int i = 0; i < number_of_courses; i++) {
+        free(courses[i]);
+    }
+    free(courses);
+
+    clear();
+    endwin();
+    return EXIT_SUCCESS;
 }
 
 int write_student_list_window(int current_row) {
@@ -199,7 +314,12 @@ int write_student_list_window(int current_row) {
     return EXIT_SUCCESS;
 }
 
-int init_field_data(int max_width, int max_height, int max_sem) {
+void update_student_list_window(int current_row) {
+    wclrtobot(student_list_win);
+    write_student_list_window(current_row);
+}
+
+void init_field_data(int max_width, int max_height, int max_sem) {
     // field lengths
     field_data.fieldSeperateLen = FIELD_SEPERATE_LEN; field_data.idFieldLen = ID_FIELD_LEN; field_data.gpaFieldLen = GPA_FIELD_LEN; field_data.cgpaFieldLen = CGPA_FIELD_LEN;
     field_data.nameFieldLen = max_width - ID_FIELD_LEN - max_sem*(GPA_FIELD_LEN + FIELD_SEPERATE_LEN) - CGPA_FIELD_LEN - 2*FIELD_SEPERATE_LEN;
@@ -215,7 +335,6 @@ int init_field_data(int max_width, int max_height, int max_sem) {
 
     field_data.height = max_height;
     field_data.semCols = max_sem;
-    return EXIT_SUCCESS;
 }
 
 int init_rows(sqlite3* db) {
@@ -273,7 +392,115 @@ int init_rows(sqlite3* db) {
     return EXIT_SUCCESS;
 }
 
-int sort_row(int sort_mode) {
+void wprint_initial_insert_student_menu(WINDOW* win, InsertFieldCoords* insertFieldCoords) {
+    int y, x;
+
+    getyx(win, y, x);
+    wprintw_center(win, COLS, _("Student Info"));
+    mvwchgat(win, y, 2, COLS-4, A_STANDOUT, 0, NULL);
+    wmove(win, y+1, 2);
+    waddstr(win, _("Student ID     : "));
+    getyx(win, insertFieldCoords->studentIdY, insertFieldCoords->studentIdX);
+    getyx(win, y, x);
+    wmove(win, y+1, 2);
+    waddstr(win, _("Student Name   : "));
+    getyx(win, insertFieldCoords->studentNameY, insertFieldCoords->studentNameX);
+    getyx(win, y, x);
+
+    wmove(win, y+2, 0);
+    wprintw_center(win, COLS, _("Course %d Info"), 1);
+    mvwchgat(win, y+2, 2, COLS-4, A_STANDOUT, 2, NULL);
+    getyx(win, y, x);
+    wmove(win, y+1, 2);
+    waddstr(win, _("Course code    : "));
+    getyx(win, insertFieldCoords->courseCodeY, insertFieldCoords->courseCodeX);
+    getyx(win, y, x);
+    wmove(win, y+1, 2);
+    waddstr(win, _("Semester       : "));
+    getyx(win, insertFieldCoords->semY, insertFieldCoords->semX);
+    getyx(win, y, x);
+    wmove(win, y+1, 2);
+    waddstr(win, _("Credit Hours   : "));
+    getyx(win, insertFieldCoords->creditHoursY, insertFieldCoords->creditHoursX);
+    getyx(win, y, x);
+    wmove(win, y+1, 2);
+    waddstr(win, _("Grade          : "));
+    getyx(win, insertFieldCoords->gradeY, insertFieldCoords->gradeX);
+}
+
+void wprint_course_insert_field(WINDOW* win, int n) {
+    int y, x;
+
+    getyx(win, y, x);
+    wprintw_center(win, COLS, _("Course %d Info"), n);
+    mvwchgat(win, y, 2, COLS-4, A_STANDOUT, n%3 + 1, NULL);
+    wmove(win, y+1, 2);
+    waddstr(win, _("Course code    : "));
+    getyx(win, y, x);
+    wmove(win, y+1, 2);
+    waddstr(win, _("Semester       : "));
+    getyx(win, y, x);
+    wmove(win, y+1, 2);
+    waddstr(win, _("Credit Hours   : "));
+    getyx(win, y, x);
+    wmove(win, y+1, 2);
+    waddstr(win, _("Grade          : "));
+}
+
+int yes_or_no_selector(WINDOW* win, int default_option) {
+    /* prints directly on the cursor position*/
+
+    int y, x, yes_start_x, yes_end_x, no_start_x, no_end_x;  // Continue?  YES  ||  NO
+    getyx(win, y, yes_start_x);
+    wprintw(win, _("YES"));
+    getyx(win, y, yes_end_x);
+
+    waddstr(win, "  ");
+
+    getyx(win, y, no_start_x);
+    wprintw(win, _("NO"));
+    getyx(win, y, no_end_x);
+
+    noecho();
+    keypad(win, TRUE);
+    curs_set(0);
+
+    int input, selection = default_option;
+    do {
+        mvwchgat(win, y, yes_start_x, no_end_x - yes_start_x, 0, 0, NULL);
+        if (selection)
+            mvwchgat(win, y, yes_start_x, yes_end_x - yes_start_x, A_STANDOUT, 0, NULL);
+        else
+            mvwchgat(win, y, no_start_x, no_end_x - no_start_x, A_STANDOUT, 0, NULL);
+        wrefresh(win);
+
+        input = wgetch(win);
+        switch (input) {
+            case KEY_LEFT:
+                if (!selection)
+                    selection = 1;
+                break;
+            case KEY_RIGHT:
+                if (selection)
+                    selection = 0;
+                break;
+            case KEY_ENTER:
+            case '\n':
+                echo();
+                wmove(win, y, 0);
+                wclrtoeol(win);
+                keypad(win, FALSE);
+                curs_set(1);
+                return selection;
+            default:
+                break;
+        }
+    } while (1);
+}
+
+/* Helpers */
+
+static inline int sort_row(int sort_mode) {
     // 1 - id, 2 - name, 3+ - gpa, ..., cgpa
     if (sort_mode == 1)
         qsort(field_data.rows, field_data.number_of_rows, sizeof(RowData), compare_id);
@@ -332,7 +559,17 @@ static inline void wprintw_footer(WINDOW* win, bool standout) {
     int crow, ccol;
     getmaxyx(win, crow, ccol);
 
-    wprintw(win, "[q] %s\t[Enter] %s", _("Quit"), _("View Details"));
+    wprintw(win, "[q] %s\t[Enter] %s\t", _("Quit"), _("View Details"));
+    waddch(win, '[');
+    waddch(win, ACS_LARROW);
+    waddch(win, ACS_RARROW);
+    waddch(win, ']');
+    wprintw(win, " %s\t", _("Change Sort Mode"));
+    waddch(win, '[');
+    waddch(win, ACS_UARROW);
+    waddch(win, ACS_DARROW);
+    waddch(win, ']');
+    wprintw(win, " %s\t", _("Scroll"));
     if (standout)
         wstandout_line(win, crow, 0);  // other color pair dont work for some reason
 }
@@ -341,7 +578,7 @@ static inline void wstandout_line(WINDOW* win, int row, int color_pair) {
     mvwchgat(win, row, 0, -1, A_STANDOUT, color_pair, NULL);  // highlight header
 }
 
-void standout_sorted_header(int sort_mode, int color_pair) {
+static inline void standout_sorted_header(int sort_mode, int color_pair) {
     int start = 0, end = 0;
     if (sort_mode >= 1)
         end += field_data.idFieldLen;

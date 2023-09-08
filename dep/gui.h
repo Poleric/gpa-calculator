@@ -24,22 +24,35 @@ typedef struct FieldData {
     int number_of_rows;
 } FieldData;
 
+typedef struct InsertFieldCoords {
+    int studentIdY, studentIdX, studentNameY, studentNameX, courseCodeY, courseCodeX, semY, semX, creditHoursY, creditHoursX, gradeY, gradeX;
+} InsertFieldCoords;
+
+// main
 int student_list_menu(sqlite3* db);
-int update_student_list_window(int current_row);
+int insert_student_menu(sqlite3* db);
+
 int write_student_list_window(int current_row);
-int init_field_data(int max_width, int max_height, int max_sem);
+void update_student_list_window(int current_row);
+void init_field_data(int max_width, int max_height, int max_sem);
 int init_rows(sqlite3* db);
+void wprint_initial_insert_student_menu(WINDOW* win, InsertFieldCoords* insertFieldCoords);
+void wprint_course_insert_field(WINDOW* win, int n);
+int yes_or_no_selector(WINDOW* win, int default_option);
+
+// helper functons
 static inline int truncate_str(char* string, size_t len);
 static inline void wprintw_center(WINDOW* win, int width, char* format, ...);
 static inline void wprintw_header(WINDOW* win, bool standout);
 static inline void wprintw_footer(WINDOW* win, bool standout);
 static inline void wstandout_line(WINDOW* win, int row, int color_pair);
-void standout_sorted_header(int sort_mode, int color_pair);
+static inline void standout_sorted_header(int sort_mode, int color_pair);
+#define center_horizontal(length, field_width) ((int)(field_width - length)/2)
 int free_row(RowData* pRow);
 int free_rows();
-#define center_horizontal(length, field_width) ((int)(field_width - length)/2)
 
-int sort_row(int sort_mode);
+// sorting functions
+static inline int sort_row(int sort_mode);
 int compare_id(const void * a, const void * b);
 int compare_id_desc(const void * a, const void * b);
 int compare_gpa(const void * a, const void * b);
