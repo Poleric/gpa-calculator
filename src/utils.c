@@ -37,6 +37,27 @@ int is_char_in(char character, const char* string, size_t arr_len) {
 	return -1;
 }
 
+int is_valid_grade(char* grade) {
+    if (strcmp(grade, "A") == 0)
+        return 1;
+    else if (strcmp(grade, "A-") == 0)
+        return 1;
+    else if (strcmp(grade, "B+") == 0)
+        return 1;
+    else if (strcmp(grade, "B") == 0)
+        return 1;
+    else if (strcmp(grade, "B-") == 0)
+        return 1;
+    else if (strcmp(grade, "C+") == 0)
+        return 1;
+    else if (strcmp(grade, "C") == 0)
+        return 1;
+    else if (strcmp(grade, "F") == 0)
+        return 1;
+    else
+        return 0;
+}
+
 char* get_day(int day) {
     switch (day) {
         case 0:
