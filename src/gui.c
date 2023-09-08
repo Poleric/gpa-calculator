@@ -206,12 +206,7 @@ int insert_student_menu(sqlite3* db) {
 
             wprintw_center(stdscr, COLS - 8, "Do you want to add another course? ");
             if (!yes_or_no_selector(stdscr, 1))
-                move((insertFieldCoords.courseCodeY - 1) + (FIELD_HEIGHT + 1) * number_of_courses, 0);
-                clrtoeol();
                 break;
-            move((insertFieldCoords.courseCodeY - 1) + (FIELD_HEIGHT + 1) * number_of_courses, 0);
-            clrtoeol();
-
             wprint_course_insert_field(stdscr, number_of_courses + 1);
         }
 
@@ -247,10 +242,10 @@ int insert_student_menu(sqlite3* db) {
             getnstr(grade, ARRAY_SIZE(grade));
         } while (!is_valid_grade(grade));
         courses[number_of_courses-1] = malloc(sizeof(Course));
-        courses[number_of_courses-1]->course_code = course_code;
+        courses[number_of_courses-1]->course_code = strdup(course_code);
         courses[number_of_courses-1]->sem = sem;
         courses[number_of_courses-1]->credit_hours = credit_hours;
-        courses[number_of_courses-1]->grade = grade;
+        courses[number_of_courses-1]->grade = strdup(grade);
     } while (1);
 
     wprintw_center(stdscr, COLS - 8, "Save record? ");
@@ -266,6 +261,8 @@ int insert_student_menu(sqlite3* db) {
     }
 
     for (int i = 0; i < number_of_courses; i++) {
+        free(courses[i]->course_code);
+        free(courses[i]->grade);
         free(courses[i]);
     }
     free(courses);
@@ -486,9 +483,11 @@ int yes_or_no_selector(WINDOW* win, int default_option) {
                 break;
             case KEY_ENTER:
             case '\n':
-                echo();
                 wmove(win, y, 0);
                 wclrtoeol(win);
+
+                // revert to before
+                echo();
                 keypad(win, FALSE);
                 curs_set(1);
                 return selection;
