@@ -15,8 +15,6 @@
 
 #define EXIT_FLAG (-1)
 
-#define ARRAY_SIZE(x) sizeof(x)/sizeof(x[0])
-
 sqlite3* db;
 
 int main() {
@@ -25,15 +23,16 @@ int main() {
     init_student_db(db);
 
     do {
-        printf("          GPA/CGPA CALCULATOR          \n");
+        printf(_("          GPA/CGPA CALCULATOR          \n"));
         printf("=======================================\n");
-        printf("ADMIN ENTER 1\n");
-        printf("STUDENT ENTER 2\n");
+        printf(_("ADMIN ENTER 1\n"));
+        printf(_("STUDENT ENTER 2\n"));
         printf("\n");
-        printf("EXIT ENTER %d\n", EXIT_FLAG);
-        printf("ENTER AS ADMIN/STUDENT : ");
+        printf(_("EXIT ENTER %d\n"), EXIT_FLAG);
+        printf(_("ENTER AS ADMIN/STUDENT : "));
         do {
             scanf("%d", &id);
+            flush_stdin();
 
             switch (id) {
                 case EXIT_FLAG:
@@ -48,27 +47,25 @@ int main() {
                     student();
                     break;
                 default:
-                    printf("PLEASE CHOOSE THE NUMBER AGAIN: ");
+                    printf(_("PLEASE CHOOSE THE NUMBER AGAIN: "));
                     id = 0;
             }
         } while (!id);  // id != 0
         clear_screen();
     } while(!exit);
-
 	sqlite3_close(db);  //close database
 }
 
 void admin(){
-
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
 
 	printf("=======================================\n");
-	printf("==        GPA/CGPA CALCULATOR        ==\n");
+	printf(_("==        GPA/CGPA CALCULATOR        ==\n"));
 	printf("=======================================\n");
-	printf("ADMINISTRATOR\n");
-	printf("SCHOOL: KOLEJ PASAR\n");
-	printf("DATE: %s,%d-%02d-%02d\n", get_day(tm.tm_wday), tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+	printf(_("ADMINISTRATOR\n"));
+	printf(_("SCHOOL: KOLEJ PASAR\n"));
+	printf(_("DATE: %s,%d-%02d-%02d\n"), get_day(tm.tm_wday), tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 	switch (adminLogin()) {
         case EXIT_SUCCESS:  // success login
             break;
@@ -77,22 +74,17 @@ void admin(){
             return;
     }
 
-    int exit = 0;
-    int option;
-
-    SQLStudent* student = get_student(db, "WBA0000ND");
-
+    int option, exit = 0;
     do {
         clear_screen();
-        printf("WELCOME TO THE ADMIN SCREEN\n");
+        printf(_("     WELCOME TO THE ADMIN SCREEN\n"));
         printf("=======================================\n");
-        printf("VIEW STUDENT LIST ENTER 1\n");
-        printf("GET A STUDENT DETAILS ENTER 2\n");
-        printf("STORE STUDENT ENTER 3\n");
-        printf("UPDATE STUDENT ENTER 4\n");
+        printf(_("VIEW student list ENTER 1\n"));
+        printf(_("GET a student details ENTER 2\n"));
+        printf(_("STORE student ENTER 3\n"));
         printf("\n");
-        printf("EXIT ENTER %d\n", EXIT_FLAG);
-        printf("ENTER: ");
+        printf(_("EXIT ENTER %d\n"), EXIT_FLAG);
+        printf(_("ENTER: "));
         do {
             scanf("%d", &option);
             flush_stdin();
@@ -101,12 +93,13 @@ void admin(){
                     student_list_menu(db);
                     break;
                 case 2:
-                    putchar('\n');
                     clear_screen();
-                    printFullStudentDetails(student);
-                    pause();
+                    getStudentDetailsScreen();
                     break;
                 case 3:
+                    clear_screen();
+                    insert_student_menu(db);
+                    break;
                 case 4:
                     break;
                 case EXIT_FLAG:
@@ -118,15 +111,12 @@ void admin(){
         } while (!option);  // option == 0
         clear_screen();
     } while (!exit); // exit == 0
-
-    free_student(student);
 }
 
 int adminLogin() {
     char input[30];
 
-    printf("ENTER THE PASSWORD: ");
-    flush_stdin();
+    printf(_("ENTER THE PASSWORD: "));
     for(int tries = 3; ; tries--){
         fgets(input, ARRAY_SIZE(input), stdin);  // gets is removed from C11
         input[strcspn(input, "\n")] = '\0';  // remove trailing newline from fgets
@@ -134,13 +124,13 @@ int adminLogin() {
         if(strcmp(input,"123456789abc") == 0) {
             return EXIT_SUCCESS;
         } else if (tries > 0) {
-            printf("PASSWORD INCORRECT\n");
-            printf("PLEASE ENTER THE PASSWORD AGAIN(%i): ", tries);
+            printf(_("PASSWORD INCORRECT\n"));
+            printf(_("PLEASE ENTER THE PASSWORD AGAIN(%i): "), tries);
         } else {
-            printf("!!!YOU HAVE ENTER THE INCORRECT ANSWER TOO MANY TIMES, PLEASE TRY AGAIN LATER!!!\n");
+            printf(_("!!!YOU HAVE ENTER THE INCORRECT ANSWER TOO MANY TIMES, PLEASE TRY AGAIN LATER!!!\n"));
             printf("================================================================================\n");
-            printf("If you have forgotten the password, please contact to look for help:012-879-3965\n");
-            printf("OR send us a email:ColejPasarService@gmail.com\n");
+            printf(_("If you have forgotten the password, please contact to look for help:012-879-3965\n"));
+            printf(_("OR send us a email:ColejPasarService@gmail.com\n"));
             printf("--------------------------------------------------------------------------------\n");
             printf("\n");
             return EXIT_FAILURE;
@@ -149,79 +139,50 @@ int adminLogin() {
 }
 
 void student(){
-
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
 
-	char studentID[100];
-	SQLStudent* student;
-
 	printf("=======================================\n");
-	printf("==        GPA/CGPA CALCULATOR        ==\n");
+	printf(_("==        GPA/CGPA CALCULATOR        ==\n"));
 	printf("=======================================\n");
-	printf("ADMINISTRATOR\n");
-	printf("SCHOOL: COLEJ PASAR\n");
-	printf("DATE: %s,%d-%02d-%02d\n", get_day(tm.tm_wday), tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
-	printf("PLEASE ENTER YOUR STUDENT ID: ");
-	scanf("%s",&studentID);  //get student id
-	student = get_student(db,studentID);  //read student from database
-
-	if (student == NULL){
-		printf("You entered a wrong ID");
-		return;
-	}
-
-    putchar('\n');
-	printStudentDetails(student);
-	free_student(student);  //free memory
-    flush_stdin();
-    pause();
+	printf(_("ADMINISTRATOR\n"));
+	printf(_("SCHOOL: COLEJ PASAR\n"));
+	printf(_("DATE: %s,%d-%02d-%02d\n"), get_day(tm.tm_wday), tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+	getStudentDetailsScreen();
 }
 
-void printStudentDetails(SQLStudent* student) {
+void getStudentDetailsScreen() {
+    char studentID[15];
+    SQLStudent *student;
 
-	SQLCourse* course;
-	char no[4];
+    do {
+        printf(_("PLEASE ENTER YOUR STUDENT ID: "));
+        fgets(studentID, ARRAY_SIZE(studentID), stdin);  // gets is removed from C11
+        studentID[strcspn(studentID, "\n")] = '\0';  // remove trailing newline from fgets
+        student = get_student(db, studentID);  //read student from database
 
-    printf("DETAILS:\n");
-    printf("=======================================\n");
-	printf("Student : %s\n",student -> name);  //print student name from the database 
-	printf("\t     -----------------\n");
-	printf("\t           GRADE      \n");
-	printf("\t     -----------------\n");
+        if (student == NULL) {
+            printf(_("You entered a wrong ID\n"));
+            continue;
+        }
 
-	for (int num = 0; num < student -> number_of_courses; num++) {
+        putchar('\n');
+        printFullStudentDetails(student);
 
-		course = student -> pSQLCourses[num];  //read the first course from student
-		snprintf(no, 4, "%d.", num+1);
-		printf("\t     %-3s %s > %s\n", no, course ->course_code,course ->grade);  //read course code from first course
-
-	}	
-	printf("\n");
-	printf("\t  ---------   -----------\n");
-	printf("\t     SEM          GPA    \n");
-	printf("\t  ---------   -----------\n");
-
-	for (int sem = 1; sem <= get_max_sem(db); sem++){
-		printf("\t      %d\t\t  %.2f\n", sem, get_student_gpa((Student*)student, sem));
-	}
-	printf("\t\t      -----------\n");
-	printf("\t\t          CGPA   \n");
-	printf("\t\t      -----------\n");
-	printf("\t\t\t  %.2f\n",get_student_cgpa((Student*)student));
+        free_student(student);  //free memory
+        pause();  // pause screen to see
+        return;
+    } while(1);
 }
 
 void printFullStudentDetails(SQLStudent* student) {
-    int max_sem;
+    printf(_("DETAILS:\n"));
+    printf("================================================\n");
+    printf(_("Student ID: %s\n"), student->name);
+    printf(_("Student Name: %s\n"), student->student_id);
+    printf(_("Total enrolled courses: %d\n"), student->number_of_courses);
 
-    printf("DETAILS:\n");
-    printf("=============================================\n");
-    printf("Student ID: %s\n", student->name);
-   printf("Student Name: %s\n", student->student_id);
-    printf("Total enrolled courses: %d\n", student->number_of_courses);
-
-    max_sem = get_max_sem(db);
-    printStudentCoursesTable(student, max_sem);
+    printStudentCoursesTable(student);
 }
 
 void printManyChar(char character, int length) {
@@ -245,13 +206,15 @@ void printLineWithManyCharWithSeperators(char character, int length, char sepera
     putchar('\n');
 }
 
-void printStudentCoursesTable(SQLStudent* student, int max_sem) {
+void printStudentCoursesTable(SQLStudent* student) {
     const int COLUMN_WIDTH = 15;
+    int max_sem = get_max_sem(db);
 
     printLineWithManyChar('=', (COLUMN_WIDTH+1)*max_sem);
 
     for (int sem = 1; sem <= max_sem; sem++) {
-        printf(" Sem %-*d", COLUMN_WIDTH - 5, sem);
+        printf(" ");
+        printf(_("Sem %-*d"), COLUMN_WIDTH - 5, sem);
         printf("|");
     }
     putchar('\n');
@@ -292,14 +255,16 @@ void printStudentCoursesTable(SQLStudent* student, int max_sem) {
     printLineWithManyCharWithSeperators('-', COLUMN_WIDTH, '|', max_sem, TRUE);
 
     for (int sem = 1; sem <= max_sem; sem++) {
-        printf("  GPA: %-*.2f", COLUMN_WIDTH - 7, get_gpa_from_courses((Course**)student->pSQLCourses, student->number_of_courses, sem));
+        printf("  ");
+        printf(_("GPA: %-*.2f"), COLUMN_WIDTH - 7, get_gpa_from_courses((Course**)student->pSQLCourses, student->number_of_courses, sem));
         printf("|");
     }
     putchar('\n');
 
     printLineWithManyChar('=', (COLUMN_WIDTH+1)*max_sem);
 
-    printf(" CGPA: %-*.2f", COLUMN_WIDTH*max_sem + max_sem - 8, get_cgpa_from_courses((Course**)student->pSQLCourses, student->number_of_courses));
+    printf(" ");
+    printf(_("CGPA: %-*.2f"), COLUMN_WIDTH*max_sem + max_sem - 8, get_cgpa_from_courses((Course**)student->pSQLCourses, student->number_of_courses));
     printf("|\n");
 
     printLineWithManyChar('=', (COLUMN_WIDTH+1)*max_sem);
