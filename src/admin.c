@@ -154,15 +154,20 @@ void student(){
 void getStudentDetailsScreen() {
     char studentID[15];
     SQLStudent *student;
+    const char* EXIT_STR = "-1";
 
     do {
         printf(_("PLEASE ENTER YOUR STUDENT ID: "));
         fgets(studentID, ARRAY_SIZE(studentID), stdin);  // gets is removed from C11
         studentID[strcspn(studentID, "\n")] = '\0';  // remove trailing newline from fgets
+        if (strcmp(studentID, EXIT_STR) == 0) {
+            break;
+        }
+
         student = get_student(db, studentID);  //read student from database
 
         if (student == NULL) {
-            printf(_("You entered a wrong ID\n"));
+            printf(_("You entered a wrong ID (Enter %s to exit)\n"), EXIT_STR);
             continue;
         }
 
