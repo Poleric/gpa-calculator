@@ -4,7 +4,7 @@
 #include <calculation.h>
 #include <utils.h>
 #include <stdarg.h>
-#include <admin.h>
+#include <main_menu.h>
 #include <gui.h>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)

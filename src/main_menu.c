@@ -3,7 +3,11 @@
 #include <string.h>
 #include <calculation.h>
 #include <utils.h>
-#include <admin.h>
+#include <main_menu.h>
+
+#include <locale.h>
+#include <libintl.h>
+#define _(String) gettext(String)
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
 #define _CRT_SECURE_NO_WARNINGS 1
@@ -14,6 +18,11 @@
 sqlite3* db;
 
 int main() {
+    // initialize locales
+    setlocale(LC_ALL, "");
+    bindtextdomain ("gpa-calculator", getenv("PWD"));
+    textdomain ("gpa-calculator");
+
 	int id, exit = 0;
 	sqlite3_open("students.db",&db);  //connect database
     init_student_db(db);
@@ -125,7 +134,7 @@ int adminLogin() {
         } else {
             printf(_("!!!YOU HAVE ENTER THE INCORRECT ANSWER TOO MANY TIMES, PLEASE TRY AGAIN LATER!!!\n"));
             printf("================================================================================\n");
-            printf(_("If you have forgotten the password, please contact to look for help:012-879-3965\n"));
+            printf(_("If you have forgotten the password, please contact to look for help:012-879 3965\n"));
             printf(_("OR send us a email:ColejPasarService@gmail.com\n"));
             printf("--------------------------------------------------------------------------------\n");
             printf("\n");

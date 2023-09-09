@@ -46,7 +46,6 @@ static inline int truncate_str(char* string, size_t len);
 static inline void wprintw_center(WINDOW* win, int width, char* format, ...);
 static inline void wprintw_header(WINDOW* win, bool standout);
 static inline void wprintw_footer(WINDOW* win, bool standout);
-static inline void wstandout_line(WINDOW* win, int row, int color_pair);
 static inline void standout_sorted_header(int sort_mode, int color_pair);
 #define center_horizontal(length, field_width) ((int)(field_width - length)/2)
 int free_row(RowData* pRow);
@@ -55,12 +54,8 @@ int free_rows();
 // sorting functions
 static inline int sort_row(int sort_mode);
 int compare_id(const void * a, const void * b);
-int compare_id_desc(const void * a, const void * b);
-int compare_gpa(const void * a, const void * b);
 int compare_gpa_desc(const void * a, const void * b);
-int compare_cgpa(const void * a, const void * b);
 int compare_cgpa_desc(const void * a, const void * b);
 int compare_name(const void * a, const void * b);
-int compare_name_desc(const void * a, const void * b);
 
 #endif //GPA_CALCULATOR_GUI_H
