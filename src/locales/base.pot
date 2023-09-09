@@ -1,0 +1,277 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-09 16:10+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/main_menu.c:26
+#, c-format
+msgid "          GPA/CGPA CALCULATOR          \n"
+msgstr ""
+
+#: src/main_menu.c:28
+#, c-format
+msgid "ADMIN ENTER 1\n"
+msgstr ""
+
+#: src/main_menu.c:29
+#, c-format
+msgid "STUDENT ENTER 2\n"
+msgstr ""
+
+#: src/main_menu.c:31 src/main_menu.c:86
+#, c-format
+msgid "EXIT ENTER %d\n"
+msgstr ""
+
+#: src/main_menu.c:32
+#, c-format
+msgid "ENTER AS ADMIN/STUDENT : "
+msgstr ""
+
+#: src/main_menu.c:50
+#, c-format
+msgid "PLEASE CHOOSE THE NUMBER AGAIN: "
+msgstr ""
+
+#: src/main_menu.c:64 src/main_menu.c:146
+#, c-format
+msgid "==        GPA/CGPA CALCULATOR        ==\n"
+msgstr ""
+
+#: src/main_menu.c:66 src/main_menu.c:148
+#, c-format
+msgid "ADMINISTRATOR\n"
+msgstr ""
+
+#: src/main_menu.c:67
+#, c-format
+msgid "SCHOOL: KOLEJ PASAR\n"
+msgstr ""
+
+#: src/main_menu.c:68 src/main_menu.c:150
+#, c-format
+msgid "DATE: %s,%d-%02d-%02d\n"
+msgstr ""
+
+#: src/main_menu.c:80
+#, c-format
+msgid "     WELCOME TO THE ADMIN SCREEN\n"
+msgstr ""
+
+#: src/main_menu.c:82
+#, c-format
+msgid "VIEW student list ENTER 1\n"
+msgstr ""
+
+#: src/main_menu.c:83
+#, c-format
+msgid "GET a student details ENTER 2\n"
+msgstr ""
+
+#: src/main_menu.c:84
+#, c-format
+msgid "STORE student ENTER 3\n"
+msgstr ""
+
+#: src/main_menu.c:87
+#, c-format
+msgid "ENTER: "
+msgstr ""
+
+#: src/main_menu.c:119
+#, c-format
+msgid "ENTER THE PASSWORD: "
+msgstr ""
+
+#: src/main_menu.c:127
+#, c-format
+msgid "PASSWORD INCORRECT\n"
+msgstr ""
+
+#: src/main_menu.c:128
+#, c-format
+msgid "PLEASE ENTER THE PASSWORD AGAIN(%i): "
+msgstr ""
+
+#: src/main_menu.c:130
+#, c-format
+msgid ""
+"!!!YOU HAVE ENTER THE INCORRECT ANSWER TOO MANY TIMES, PLEASE TRY AGAIN "
+"LATER!!!\n"
+msgstr ""
+
+#: src/main_menu.c:132
+#, c-format
+msgid ""
+"If you have forgotten the password, please contact to look for "
+"help:012-879 3965\n"
+msgstr ""
+
+#: src/main_menu.c:133
+#, c-format
+msgid "OR send us a email:ColejPasarService@gmail.com\n"
+msgstr ""
+
+#: src/main_menu.c:149
+#, c-format
+msgid "SCHOOL: COLEJ PASAR\n"
+msgstr ""
+
+#: src/main_menu.c:160
+#, c-format
+msgid "PLEASE ENTER YOUR STUDENT ID: "
+msgstr ""
+
+#: src/main_menu.c:170
+#, c-format
+msgid "You entered a wrong ID (Enter %s to exit)\n"
+msgstr ""
+
+#: src/main_menu.c:184
+#, c-format
+msgid "DETAILS:\n"
+msgstr ""
+
+#: src/main_menu.c:186
+#, c-format
+msgid "Student ID: %s\n"
+msgstr ""
+
+#: src/main_menu.c:187
+#, c-format
+msgid "Student Name: %s\n"
+msgstr ""
+
+#: src/main_menu.c:188
+#, c-format
+msgid "Total enrolled courses: %d\n"
+msgstr ""
+
+#: src/main_menu.c:222
+#, c-format
+msgid "Sem %-*d"
+msgstr ""
+
+#: src/main_menu.c:264
+#, c-format
+msgid "GPA: %-*.2f"
+msgstr ""
+
+#: src/main_menu.c:272
+#, c-format
+msgid "CGPA: %-*.2f"
+msgstr ""
+
+#: src/gui.c:28
+msgid "Student ID"
+msgstr ""
+
+#: src/gui.c:29
+msgid "Student Name"
+msgstr ""
+
+#: src/gui.c:30
+#, c-format
+msgid "GPA (S%d)"
+msgstr ""
+
+#: src/gui.c:31
+msgid "CGPA"
+msgstr ""
+
+#: src/gui.c:58 src/gui.c:178
+#, c-format
+msgid "Your terminal does not support color\n"
+msgstr ""
+
+#: src/gui.c:72
+#, c-format
+msgid "Screen is too small, resize to be atleast %d wide.\n"
+msgstr ""
+
+#: src/gui.c:77
+msgid "Kolej Pasar Students"
+msgstr ""
+
+#: src/gui.c:195
+msgid "Inserting Student"
+msgstr ""
+
+#: src/gui.c:223
+msgid "Do you want to add another course? "
+msgstr ""
+
+#: src/gui.c:274
+msgid "Save record? "
+msgstr ""
+
+#: src/gui.c:419
+msgid "Student Info"
+msgstr ""
+
+#: src/gui.c:422
+msgid "Student ID     : "
+msgstr ""
+
+#: src/gui.c:426
+msgid "Student Name   : "
+msgstr ""
+
+#: src/gui.c:431 src/gui.c:455
+#, c-format
+msgid "Course %d Info"
+msgstr ""
+
+#: src/gui.c:435 src/gui.c:458
+msgid "Course code    : "
+msgstr ""
+
+#: src/gui.c:439 src/gui.c:461
+msgid "Semester       : "
+msgstr ""
+
+#: src/gui.c:443 src/gui.c:464
+msgid "Credit Hours   : "
+msgstr ""
+
+#: src/gui.c:447 src/gui.c:467
+msgid "Grade          : "
+msgstr ""
+
+#: src/gui.c:475
+msgid "YES"
+msgstr ""
+
+#: src/gui.c:481
+msgid "NO"
+msgstr ""
+
+#: src/gui.c:584
+msgid "Quit"
+msgstr ""
+
+#: src/gui.c:584
+msgid "View Details"
+msgstr ""
+
+#: src/gui.c:589
+msgid "Change Sort Mode"
+msgstr ""
+
+#: src/gui.c:594
+msgid "Scroll"
+msgstr ""
