@@ -7,10 +7,6 @@
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
 #define _CRT_SECURE_NO_WARNINGS 1
-#define _(String) String
-#else
-#include <libintl.h>
-#define _(String) gettext(String)
 #endif
 
 #define EXIT_FLAG (-1)

@@ -12,7 +12,7 @@ set(SOURCES
         ./src/calculation.c
         ./src/gui.c
         ./src/utils.c
-        ./src/admin.c
+        src/main_menu.c
 )
 add_executable(gpa-calculator ${SOURCES})
 
