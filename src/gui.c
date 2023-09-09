@@ -10,11 +10,13 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
 #define strdup _strdup  //  warning C4996: 'strdup': The POSIX name for this item is deprecated.
 #define _CRT_SECURE_NO_WARNINGS 1
-#define _(String) String
+#define _(String) String  // TODO: make gettext work on non POSIX systems
 #else
 #include <libintl.h>
 #define _(String) gettext(String)
 #endif
+
+// this entire module is a mistake
 
 #define FIELD_SEPERATE_LEN 2
 
@@ -28,10 +30,25 @@
 #define GPA_FIELD_STRING _("GPA (S%d)")
 #define CGPA_FIELD_STRING _("CGPA")
 
-// used by gui functions.
+#define wstandout_line(win, row, color_pair) mvwchgat(win, row, 0, -1, A_STANDOUT, color_pair, NULL)
+
+// used by student_list_menu
 WINDOW* student_list_win;
 FieldData field_data;
-int sort_gpa;  // only used in compare_gpa
+
+int sort_gpa_sem;  // workaround for compare_gpa by semester.
+const int N_COLOR = 3;
+
+void init_color_pairs() {
+    /* Initialize preset colors pairs
+     * 1 - Green background
+     * 2 - Cyan background
+     * 3 - Yellow background
+     */
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);
+    init_pair(2, COLOR_CYAN, COLOR_BLACK);
+    init_pair(3, COLOR_YELLOW, COLOR_BLACK);
+}
 
 int student_list_menu(sqlite3* db) {
     // ncurses
@@ -41,20 +58,22 @@ int student_list_menu(sqlite3* db) {
         printf(_("Your terminal does not support color\n"));
         return EXIT_FAILURE;
     }
-    start_color();
+    start_color(); init_color_pairs();
     cbreak();       // get input for each character
     noecho();       // no display input
 
+    // initialize stuff that might be used
+    int max_students = get_number_of_students(db);
     int max_sem = get_max_sem(db);
-    init_field_data(COLS, LINES-3, max_sem);
 
+    init_field_data(COLS, LINES-3, max_sem);
     if (field_data.width > COLS) {
         endwin();
         fprintf(stderr, _("Screen is too small, resize to be atleast %d wide.\n"), field_data.width);
         return EXIT_FAILURE;
     }
 
-
+    // print title, header, footer
     wprintw_center(stdscr, COLS, _("Kolej Pasar Students"));
     move(1, 0);        // print table header below title
     wprintw_header(stdscr, TRUE);
@@ -62,9 +81,6 @@ int student_list_menu(sqlite3* db) {
     wprintw_footer(stdscr, TRUE);
     refresh();
 
-    init_pair(1, COLOR_GREEN, COLOR_BLACK);
-    init_pair(2, COLOR_CYAN, COLOR_BLACK);
-    int max_students = get_number_of_students(db);
     field_data.rows = calloc(max_students, sizeof(RowData));
     field_data.number_of_rows = max_students;
     init_rows(db);
@@ -154,11 +170,7 @@ int student_list_menu(sqlite3* db) {
     return EXIT_SUCCESS;
 }
 
-int insert_student_menu(sqlite3* db) {
-    Student student;
-    Course** courses = NULL;
-    InsertFieldCoords insertFieldCoords;
-
+int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
     // ncurses
     initscr();      // start
     if(has_colors() == FALSE) {
@@ -166,23 +178,29 @@ int insert_student_menu(sqlite3* db) {
         printf(_("Your terminal does not support color\n"));
         return EXIT_FAILURE;
     }
-    start_color();
+    start_color(); init_color_pairs();
     noecho();
     scrollok(stdscr, TRUE);
 
-    const int N_COLOR = 3;
-    init_pair(1, COLOR_GREEN, COLOR_BLACK);
-    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(3, COLOR_CYAN, COLOR_BLACK);
+    Student student;
+    Course** courses = NULL;
+    InsertFieldCoords insertFieldCoords;
 
+    // inputs
+    char student_id[20], student_name[64];
+    char course_code[15], grade[3];
+    int sem, credit_hours;
+
+    // title
     wprintw_center(stdscr, COLS, _("Inserting Student"));
     wstandout_line(stdscr, 0, 0);
+    // fields
     move(2, 0);
     wprint_initial_insert_student_menu(stdscr, &insertFieldCoords);
     refresh();
 
-    echo();
-    char student_id[20], student_name[64];
+    echo();  // enable back display typed characters
+    // accept student info
     do {
         move(insertFieldCoords.studentIdY, insertFieldCoords.studentIdX);
         clrtoeol();
@@ -196,21 +214,22 @@ int insert_student_menu(sqlite3* db) {
 
     const int FIELD_HEIGHT = 5;
     void * tmp;  // for checking alloc ok or not
-
-    // Course info fields
-    char course_code[15], grade[3];
-    int sem, credit_hours, number_of_courses = 0, selection = 0;
-    do {
+    // accept course(s) info
+    int number_of_courses = 0, selection = 0;
+    do {  // might be multiple courses
         if (number_of_courses != 0) {
             move((insertFieldCoords.courseCodeY - 1) + (FIELD_HEIGHT + 1) * number_of_courses, 0);
 
             wprintw_center(stdscr, COLS - 8, _("Do you want to add another course? "));
             if (!yes_or_no_selector(stdscr, 1))
                 break;
-            wprint_course_insert_field(stdscr, number_of_courses + 1);
+
+            wprint_course_insert_field(stdscr, number_of_courses + 2);  // +1 to compensate the ++ later, and +1 to compensate for the initial run
         }
 
         number_of_courses++;
+
+        // realloc thing
         tmp = realloc(courses, number_of_courses*sizeof(Course*));
         if (tmp == NULL) {
             log_alloc_error("insert_student_name", "courses");
@@ -221,6 +240,7 @@ int insert_student_menu(sqlite3* db) {
         }
         courses = tmp;
 
+        // accept input from course fields
         do {
             move(insertFieldCoords.courseCodeY + (FIELD_HEIGHT + 1) * (number_of_courses - 1), insertFieldCoords.courseCodeX);
             clrtoeol();
@@ -241,15 +261,18 @@ int insert_student_menu(sqlite3* db) {
             clrtoeol();
             getnstr(grade, ARRAY_SIZE(grade));
         } while (!is_valid_grade(grade));
+
+        // build course
         courses[number_of_courses-1] = malloc(sizeof(Course));
-        courses[number_of_courses-1]->course_code = strdup(course_code);
+        courses[number_of_courses-1]->course_code = strdup(course_code);  // TODO: check allocation == NULL
         courses[number_of_courses-1]->sem = sem;
         courses[number_of_courses-1]->credit_hours = credit_hours;
         courses[number_of_courses-1]->grade = strdup(grade);
     } while (1);
 
+    // ask to save or not
     wprintw_center(stdscr, COLS - 8, _("Save record? "));
-    if (yes_or_no_selector(stdscr, 1)) {
+    if (yes_or_no_selector(stdscr, 1)) {  // yes
         student = (Student) {
                 student_id,
                 student_name,
@@ -258,7 +281,7 @@ int insert_student_menu(sqlite3* db) {
         };
         store_student(db, &student);
         store_student_courses(db, &student);
-    }
+    }  // no, do nothing
 
     for (int i = 0; i < number_of_courses; i++) {
         free(courses[i]->course_code);
@@ -406,7 +429,7 @@ void wprint_initial_insert_student_menu(WINDOW* win, InsertFieldCoords* insertFi
 
     wmove(win, y+2, 0);
     wprintw_center(win, COLS, _("Course %d Info"), 1);
-    mvwchgat(win, y+2, 2, COLS-4, A_STANDOUT, 2, NULL);
+    mvwchgat(win, y+2, 2, COLS-4, A_STANDOUT, 1, NULL);
     getyx(win, y, x);
     wmove(win, y+1, 2);
     waddstr(win, _("Course code    : "));
@@ -430,7 +453,7 @@ void wprint_course_insert_field(WINDOW* win, int n) {
 
     getyx(win, y, x);
     wprintw_center(win, COLS, _("Course %d Info"), n);
-    mvwchgat(win, y, 2, COLS-4, A_STANDOUT, n%3 + 1, NULL);
+    mvwchgat(win, y, 2, COLS-4, A_STANDOUT, n%N_COLOR + 1, NULL);
     wmove(win, y+1, 2);
     waddstr(win, _("Course code    : "));
     getyx(win, y, x);
@@ -506,7 +529,7 @@ static inline int sort_row(int sort_mode) {
     else if (sort_mode == 2)
         qsort(field_data.rows, field_data.number_of_rows, sizeof(RowData), compare_name);
     else if (sort_mode >= 3 && sort_mode < 3 + field_data.semCols) {
-        sort_gpa = sort_mode - 3;
+        sort_gpa_sem = sort_mode - 3;
         qsort(field_data.rows, field_data.number_of_rows, sizeof(RowData), compare_gpa_desc);
     } else
         qsort(field_data.rows, field_data.number_of_rows, sizeof(RowData), compare_cgpa_desc);
@@ -570,11 +593,7 @@ static inline void wprintw_footer(WINDOW* win, bool standout) {
     waddch(win, ']');
     wprintw(win, " %s\t", _("Scroll"));
     if (standout)
-        wstandout_line(win, crow, 0);  // other color pair dont work for some reason
-}
-
-static inline void wstandout_line(WINDOW* win, int row, int color_pair) {
-    mvwchgat(win, row, 0, -1, A_STANDOUT, color_pair, NULL);  // highlight header
+        wstandout_line(win, crow, 0);  // other color pair don't work for some reason, make line invisible until terminal resized.
 }
 
 static inline void standout_sorted_header(int sort_mode, int color_pair) {
@@ -608,38 +627,13 @@ int compare_id(const void * a, const void * b) {
     return strcmp(r1->studentID, r2->studentID);
 }
 
-int compare_id_desc(const void * a, const void * b) {
-    RowData *r1 = (RowData*)a;
-    RowData *r2 = (RowData*)b;
-
-    return strcmp(r2->studentID, r1->studentID);
-}
-
-int compare_gpa(const void * a, const void * b) {
-    RowData *r1 = (RowData*)a;
-    RowData *r2 = (RowData*)b;
-
-    float fa = r1->gpas[sort_gpa];
-    float fb = r2->gpas[sort_gpa];
-    return (fa > fb) - (fa < fb);
-}
-
 int compare_gpa_desc(const void * a, const void * b) {
     RowData *r1 = (RowData*)a;
     RowData *r2 = (RowData*)b;
 
-    float fa = r1->gpas[sort_gpa];
-    float fb = r2->gpas[sort_gpa];
+    float fa = r1->gpas[sort_gpa_sem];
+    float fb = r2->gpas[sort_gpa_sem];
     return (fa < fb) - (fa > fb);
-}
-
-int compare_cgpa(const void * a, const void * b) {
-    RowData *r1 = (RowData*)a;
-    RowData *r2 = (RowData*)b;
-
-    float fa = r1->cgpa;
-    float fb = r2->cgpa;
-    return (fa > fb) - (fa < fb);
 }
 
 int compare_cgpa_desc(const void * a, const void * b) {
@@ -656,13 +650,6 @@ int compare_name(const void * a, const void * b) {
     RowData *r2 = (RowData*)b;
 
     return strcmp(r1->studentName, r2->studentName);
-}
-
-int compare_name_desc(const void * a, const void * b) {
-    RowData *r1 = (RowData*)a;
-    RowData *r2 = (RowData*)b;
-
-    return strcmp(r2->studentName, r1->studentName);
 }
 
 int free_row(RowData* pRow) {

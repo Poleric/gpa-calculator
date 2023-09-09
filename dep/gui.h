@@ -32,6 +32,7 @@ typedef struct InsertFieldCoords {
 int student_list_menu(sqlite3* db);
 int insert_student_menu(sqlite3* db);
 
+void init_color_pairs();
 int write_student_list_window(int current_row);
 void update_student_list_window(int current_row);
 void init_field_data(int max_width, int max_height, int max_sem);
