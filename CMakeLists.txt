@@ -15,7 +15,7 @@ set(SOURCES
     ${CMAKE_SOURCE_DIR}/src/main_menu.c
 )
 
-add_compile_definitions("LOCALE_DIR=\"${CMAKE_SOURCE_DIR}/res/locale\"")
+add_compile_definitions("LOCALE_DIR=\"${CMAKE_SOURCE_DIR}/i18n\"")
 add_executable(gpa-calculator ${SOURCES})
 
 if (WIN32 OR MSVC)
