@@ -7,17 +7,13 @@
 
 #include <locale.h>
 #include <libintl.h>
-#define _(String) gettext(String)
 
 #ifdef LOCALE_DIR
 #else
 #define LOCALE_DIR "/usr/local/share/locale"
 #endif
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
+#define _(String) gettext(String)
 #define EXIT_FLAG (-1)
 
 sqlite3* db;
@@ -25,8 +21,8 @@ sqlite3* db;
 int main() {
     // initialize locales
     setlocale(LC_ALL, "");
-    bindtextdomain ("gpa-calculator", LOCALE_DIR);
-    textdomain ("gpa-calculator");
+    bindtextdomain("gpa-calculator", LOCALE_DIR);
+    textdomain("gpa-calculator");
 
 	int id, exit = 0;
 	sqlite3_open("students.db",&db);  //connect database

@@ -7,13 +7,13 @@
 #include <main_menu.h>
 #include <gui.h>
 
+#include <locale.h>
+#include <libintl.h>
+
+#define _(String) gettext(String)
+
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
 #define strdup _strdup  //  warning C4996: 'strdup': The POSIX name for this item is deprecated.
-#define _CRT_SECURE_NO_WARNINGS 1
-#define _(String) String  // TODO: make gettext work on non POSIX systems
-#else
-#include <libintl.h>
-#define _(String) gettext(String)
 #endif
 
 // this entire module is a mistake
@@ -263,11 +263,19 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
         } while (!is_valid_grade(grade));
 
         // build course
-        courses[number_of_courses-1] = malloc(sizeof(Course));
-        courses[number_of_courses-1]->course_code = strdup(course_code);  // TODO: check allocation == NULL
-        courses[number_of_courses-1]->sem = sem;
-        courses[number_of_courses-1]->credit_hours = credit_hours;
-        courses[number_of_courses-1]->grade = strdup(grade);
+        Course* course = malloc(sizeof(Course));
+        if (course == NULL) {
+            log_alloc_error("insert_student_menu", "course");
+            free(course_code);
+            free(grade);
+            return EXIT_FAILURE;
+        }
+        course->course_code = strdup(course_code);  // TODO: check allocation == NULL
+        course->sem = sem;
+        course->credit_hours = credit_hours;
+        course->grade = strdup(grade);
+
+        courses[number_of_courses - 1] = course;
     } while (1);
 
     // ask to save or not
