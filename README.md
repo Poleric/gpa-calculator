@@ -20,6 +20,8 @@ sudo apt-get install libncurses5-dev libncursesw5-dev
 
 For compiling and building on Windows, it's recommended to use `vcpkg` to manage library.
 
+- Install GNU gettext binaries. https://mlocati.github.io/articles/gettext-iconv-windows.html 
+
 - Installing vcpkg
 
 ```cmd
