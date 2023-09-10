@@ -266,8 +266,6 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
         Course* course = malloc(sizeof(Course));
         if (course == NULL) {
             log_alloc_error("insert_student_menu", "course");
-            free(course_code);
-            free(grade);
             return EXIT_FAILURE;
         }
         course->course_code = strdup(course_code);  // TODO: check allocation == NULL
