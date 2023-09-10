@@ -10,7 +10,7 @@
 #define _(String) gettext(String)
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
-#define _CRT_SECURE_NO_WARNINGS 1
+#define _CRT_SECURE_NO_WARNINGS
 #endif
 
 #define EXIT_FLAG (-1)
@@ -28,7 +28,7 @@ int main() {
     init_student_db(db);
 
     do {
-        printf(_("          GPA/CGPA CALCULATOR          \n"));
+        printf("          %s          \n", _("GPA/CGPA CALCULATOR"));
         printf("=======================================\n");
         printf(_("ADMIN ENTER 1\n"));
         printf(_("STUDENT ENTER 2\n"));
@@ -66,7 +66,7 @@ void admin(){
 	struct tm tm = *localtime(&t);
 
 	printf("=======================================\n");
-	printf(_("==        GPA/CGPA CALCULATOR        ==\n"));
+	printf("==        %s        ==\n", _("GPA/CGPA CALCULATOR"));
 	printf("=======================================\n");
 	printf(_("ADMINISTRATOR\n"));
 	printf(_("SCHOOL: KOLEJ PASAR\n"));
@@ -82,7 +82,7 @@ void admin(){
     int option, exit = 0;
     do {
         clear_screen();
-        printf(_("     WELCOME TO THE ADMIN SCREEN\n"));
+        printf("     %s\n", _("WELCOME TO THE ADMIN SCREEN"));
         printf("=======================================\n");
         printf(_("VIEW student list ENTER 1\n"));
         printf(_("GET a student details ENTER 2\n"));
@@ -134,8 +134,8 @@ int adminLogin() {
         } else {
             printf(_("!!!YOU HAVE ENTER THE INCORRECT ANSWER TOO MANY TIMES, PLEASE TRY AGAIN LATER!!!\n"));
             printf("================================================================================\n");
-            printf(_("If you have forgotten the password, please contact to look for help:012-879 3965\n"));
-            printf(_("OR send us a email:ColejPasarService@gmail.com\n"));
+            printf(_("If you have forgotten the password, please contact to look for help: %s\n"), "012-879 3965");
+            printf(_("OR send us a email: %s\n"), "ColejPasarService@gmail.com");
             printf("--------------------------------------------------------------------------------\n");
             printf("\n");
             return EXIT_FAILURE;
@@ -148,10 +148,10 @@ void student(){
 	struct tm tm = *localtime(&t);
 
 	printf("=======================================\n");
-	printf(_("==        GPA/CGPA CALCULATOR        ==\n"));
+	printf("==        %s        ==\n", _("GPA/CGPA CALCULATOR"));
 	printf("=======================================\n");
-	printf(_("ADMINISTRATOR\n"));
-	printf(_("SCHOOL: COLEJ PASAR\n"));
+	printf(_("STUDENT\n"));
+	printf(_("SCHOOL: KOLEJ PASAR\n"));
 	printf(_("DATE: %s,%d-%02d-%02d\n"), get_day(tm.tm_wday), tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 	getStudentDetailsScreen();
 }
@@ -165,6 +165,7 @@ void getStudentDetailsScreen() {
         printf(_("PLEASE ENTER YOUR STUDENT ID: "));
         fgets(studentID, ARRAY_SIZE(studentID), stdin);  // gets is removed from C11
         studentID[strcspn(studentID, "\n")] = '\0';  // remove trailing newline from fgets
+
         if (strcmp(studentID, EXIT_STR) == 0) {
             break;
         }

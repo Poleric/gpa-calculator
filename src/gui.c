@@ -419,11 +419,11 @@ void wprint_initial_insert_student_menu(WINDOW* win, InsertFieldCoords* insertFi
     wprintw_center(win, COLS, _("Student Info"));
     mvwchgat(win, y, 2, COLS-4, A_STANDOUT, 0, NULL);
     wmove(win, y+1, 2);
-    waddstr(win, _("Student ID     : "));
+    wprintw(win, _("%-15s: "), _("Student ID"));
     getyx(win, insertFieldCoords->studentIdY, insertFieldCoords->studentIdX);
     getyx(win, y, x);
     wmove(win, y+1, 2);
-    waddstr(win, _("Student Name   : "));
+    wprintw(win, _("%-15s: "), _("Student Name"));
     getyx(win, insertFieldCoords->studentNameY, insertFieldCoords->studentNameX);
     getyx(win, y, x);
 
@@ -432,19 +432,19 @@ void wprint_initial_insert_student_menu(WINDOW* win, InsertFieldCoords* insertFi
     mvwchgat(win, y+2, 2, COLS-4, A_STANDOUT, 1, NULL);
     getyx(win, y, x);
     wmove(win, y+1, 2);
-    waddstr(win, _("Course code    : "));
+    wprintw(win, _("%-15s: "), _("Course code"));
     getyx(win, insertFieldCoords->courseCodeY, insertFieldCoords->courseCodeX);
     getyx(win, y, x);
     wmove(win, y+1, 2);
-    waddstr(win, _("Semester       : "));
+    wprintw(win, _("%-15s: "), _("Semester"));
     getyx(win, insertFieldCoords->semY, insertFieldCoords->semX);
     getyx(win, y, x);
     wmove(win, y+1, 2);
-    waddstr(win, _("Credit Hours   : "));
+    wprintw(win, _("%-15s: "), _("Credit Hours"));
     getyx(win, insertFieldCoords->creditHoursY, insertFieldCoords->creditHoursX);
     getyx(win, y, x);
     wmove(win, y+1, 2);
-    waddstr(win, _("Grade          : "));
+    wprintw(win, _("%-15s: "), _("Grade"));
     getyx(win, insertFieldCoords->gradeY, insertFieldCoords->gradeX);
 }
 
@@ -455,16 +455,16 @@ void wprint_course_insert_field(WINDOW* win, int n) {
     wprintw_center(win, COLS, _("Course %d Info"), n);
     mvwchgat(win, y, 2, COLS-4, A_STANDOUT, n%N_COLOR + 1, NULL);
     wmove(win, y+1, 2);
-    waddstr(win, _("Course code    : "));
+    wprintw(win, "%-15s: ", _("Course code"));
     getyx(win, y, x);
     wmove(win, y+1, 2);
-    waddstr(win, _("Semester       : "));
+    wprintw(win, "%-15s: ", _("Semester"));
     getyx(win, y, x);
     wmove(win, y+1, 2);
-    waddstr(win, _("Credit Hours   : "));
+    wprintw(win, "%-15s: ", _("Credit Hours"));
     getyx(win, y, x);
     wmove(win, y+1, 2);
-    waddstr(win, _("Grade          : "));
+    wprintw(win, "%-15s: ", _("Grade"));
 }
 
 int yes_or_no_selector(WINDOW* win, int default_option) {
