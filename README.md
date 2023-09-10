@@ -18,9 +18,20 @@ sudo apt-get install libncurses5-dev libncursesw5-dev
 
 ### Windows
 
-For compiling and building on Windows, it's recommended to use `vcpkg` to manage library, in this case for `pdcurses`.
+For compiling and building on Windows, it's recommended to use `vcpkg` to manage library.
+
+- Installing vcpkg
 
 ```cmd
-vcpkg install pdcurses:x64-windows
-vcpkg integrate install
+> git clone https://github.com/microsoft/vcpkg
+> cd vcpkg
+> bootstrap-vcpkg.bat
+```
+
+- Installing required dependencies
+
+```cmd
+> vcpkg install pdcurses:x64-windows
+> vcpkg install gettext:x64-windows
+> vcpkg integrate install
 ```
