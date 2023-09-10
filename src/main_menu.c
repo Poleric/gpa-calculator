@@ -9,6 +9,11 @@
 #include <libintl.h>
 #define _(String) gettext(String)
 
+#ifdef LOCALE_DIR
+#else
+#define LOCALE_DIR "/usr/local/share/locale"
+#endif
+
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
 #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -20,7 +25,7 @@ sqlite3* db;
 int main() {
     // initialize locales
     setlocale(LC_ALL, "");
-    bindtextdomain ("gpa-calculator", getenv("PWD"));
+    bindtextdomain ("gpa-calculator", LOCALE_DIR);
     textdomain ("gpa-calculator");
 
 	int id, exit = 0;
