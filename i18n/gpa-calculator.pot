@@ -1,0 +1,339 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the gpa-calculator package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: gpa-calculator 1.0\n"
+"Report-Msgid-Bugs-To: noreply@example.com\n"
+"POT-Creation-Date: 2023-09-10 20:08+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:46
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:124
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:206
+msgid "GPA/CGPA CALCULATOR"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:48
+#, c-format
+msgid "ADMIN ENTER 1\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:49
+#, c-format
+msgid "STUDENT ENTER 2\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:51
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:146
+#, c-format
+msgid "EXIT ENTER %d\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:52
+#, c-format
+msgid "ENTER AS ADMIN/STUDENT : "
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:70
+#, c-format
+msgid "PLEASE CHOOSE THE NUMBER AGAIN: "
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:86
+#, c-format
+msgid "Language\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:94
+#, c-format
+msgid "Enter a number > "
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:98
+#, c-format
+msgid "%d is not a valid option. Please input again.\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:126
+#, c-format
+msgid "ADMINISTRATOR\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:127
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:209
+#, c-format
+msgid "SCHOOL: KOLEJ PASAR\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:128
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:210
+#, c-format
+msgid "DATE: %s,%d-%02d-%02d\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:140
+msgid "WELCOME TO THE ADMIN SCREEN"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:142
+#, c-format
+msgid "VIEW student list ENTER 1\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:143
+#, c-format
+msgid "GET a student details ENTER 2\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:144
+#, c-format
+msgid "STORE student ENTER 3\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:147
+#, c-format
+msgid "ENTER: "
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:179
+#, c-format
+msgid "ENTER THE PASSWORD: "
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:187
+#, c-format
+msgid "PASSWORD INCORRECT\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:188
+#, c-format
+msgid "PLEASE ENTER THE PASSWORD AGAIN(%i): "
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:190
+#, c-format
+msgid ""
+"!!!YOU HAVE ENTER THE INCORRECT ANSWER TOO MANY TIMES, PLEASE TRY AGAIN "
+"LATER!!!\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:192
+#, c-format
+msgid ""
+"If you have forgotten the password, please contact to look for help: %s\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:193
+#, c-format
+msgid "OR send us a email: %s\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:208
+#, c-format
+msgid "STUDENT\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:220
+#, c-format
+msgid "PLEASE ENTER YOUR STUDENT ID: "
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:231
+#, c-format
+msgid "You entered a wrong ID (Enter %s to exit)\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:245
+#, c-format
+msgid "DETAILS:\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:247
+#, c-format
+msgid "Student ID: %s\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:248
+#, c-format
+msgid "Student Name: %s\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:249
+#, c-format
+msgid "Total enrolled courses: %d\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:283
+#, c-format
+msgid "Sem %-*d"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:325
+#, c-format
+msgid "GPA: %-*.2f"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:333
+#, c-format
+msgid "CGPA: %-*.2f"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:25
+#, c-format
+msgid "Press ENTER to proceed"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:67
+msgid "MONDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:69
+msgid "TUESDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:71
+msgid "WEDNESDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:73
+msgid "THURSDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:75
+msgid "FRIDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:77
+msgid "SATURDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:79
+msgid "SUNDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:81
+msgid "INVALID DAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:28
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:428
+msgid "Student ID"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:29
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:432
+msgid "Student Name"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:30
+#, c-format
+msgid "GPA (S%d)"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:31
+msgid "CGPA"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:58
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:178
+#, c-format
+msgid "Your terminal does not support color\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:72
+#, c-format
+msgid "Screen is too small, resize to be atleast %d wide.\n"
+msgstr ""
+
+#. print title, header, footer
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:77
+msgid "Kolej Pasar Students"
+msgstr ""
+
+#. title
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:195
+msgid "Inserting Student"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:223
+msgid "Do you want to add another course? "
+msgstr ""
+
+#. ask to save or not
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:280
+msgid "Save record? "
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:425
+msgid "Student Info"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:428
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:432
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:441
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:445
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:449
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:453
+#, c-format
+msgid "%-15s: "
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:437
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:461
+#, c-format
+msgid "Course %d Info"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:441
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:464
+msgid "Course code"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:445
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:467
+msgid "Semester"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:449
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:470
+msgid "Credit Hours"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:453
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:473
+msgid "Grade"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:481
+msgid "YES"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:487
+msgid "NO"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:590
+msgid "Quit"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:590
+msgid "View Details"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:595
+msgid "Change Sort Mode"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:600
+msgid "Scroll"
+msgstr ""
