@@ -7,28 +7,42 @@
 
 #include <locale.h>
 #include <libintl.h>
+#define _(String) gettext(String)
+#define ARRAY_SIZE(x) sizeof(x)/sizeof(x[0])
 
 #ifdef LOCALE_DIR
 #else
 #define LOCALE_DIR "/usr/local/share/locale"
 #endif
 
-#define _(String) gettext(String)
+
 #define EXIT_FLAG (-1)
+
+// language defines
+#define ENGLISH_UK "en_GB"
+#define ENGLISH_US "en_US"
+#define CHINESE_CN "zh_CN"
+#define MALAY_MY "ms_MY"
+#define SUPPORTED_LANGUAGES_TEXT {"English (United Kingdom)", "English (United State)", "简体中文", "Bahasa Melayu"}
+#define SUPPORTED_LANGUAGES_CODES {ENGLISH_UK, ENGLISH_US, CHINESE_CN, MALAY_MY}
 
 sqlite3* db;
 
 int main() {
     // initialize locales
-    setlocale(LC_ALL, "");
-    bindtextdomain("gpa-calculator", LOCALE_DIR);
-    textdomain("gpa-calculator");
-
 	int id, exit = 0;
+    char* locale;
+
 	sqlite3_open("students.db",&db);  //connect database
     init_student_db(db);
 
+    clear_screen();
+    locale = promptLanguage();
+    setLocale(locale);
+
     do {
+        clear_screen();
+        printf("=======================================\n");
         printf("          %s          \n", _("GPA/CGPA CALCULATOR"));
         printf("=======================================\n");
         printf(_("ADMIN ENTER 1\n"));
@@ -61,6 +75,46 @@ int main() {
     } while(!exit);
 	sqlite3_close(db);  //close database
 }
+
+char* promptLanguage() {
+    /* Returns the corresponding locale code the user selected */
+    char* supported_langs[] = SUPPORTED_LANGUAGES_TEXT;
+    char* supported_langs_code[] = SUPPORTED_LANGUAGES_CODES;
+    int input_num;
+
+    printf("======================================\n");
+    printf(_("Language\n"));
+    printf("======================================\n");
+    for (int i = 0; i < ARRAY_SIZE(supported_langs); i++)
+        printf("[%d] %s\n", i + 1, supported_langs[i]);
+
+    putchar('\n');
+
+    do {
+        printf(_("Enter a number > "));
+        scanf("%d", &input_num);
+
+        if (input_num > ARRAY_SIZE(supported_langs))
+            printf(_("%d is not a valid option. Please input again.\n"), input_num);
+        else
+            break;
+    } while (1);
+
+    return supported_langs_code[input_num - 1];
+}
+
+char* setLocale(char* lang_code) {
+    char* set_locale;
+
+    setenv("LANGUAGE", lang_code, 1);
+    setenv("LANGUAGE", lang_code, 1);
+    set_locale = setlocale(LC_ALL, "");
+    bindtextdomain("gpa-calculator", LOCALE_DIR);
+    textdomain("gpa-calculator");
+
+    return set_locale;
+}
+
 
 void admin(){
 	time_t t = time(NULL);

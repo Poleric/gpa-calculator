@@ -9,7 +9,8 @@ void admin();
 int adminLogin();
 void student();
 
-//void printStudentDetails(SQLStudent* student);
+char* promptLanguage();
+char* setLocale(char* lang_code);
 void getStudentDetailsScreen();
 void printFullStudentDetails(SQLStudent* student);
 
