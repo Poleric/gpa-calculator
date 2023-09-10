@@ -5,13 +5,22 @@ A GPA calculator and interface written in C.
 
 ### Linux
 
-Compilation works out of the box on GNU Linux OS.
+Requires ncurses and CMake
+
+#### Debian
+
+- Installing ncurses
+
+```shell
+sudo apt-get update
+sudo apt-get install libncurses5-dev libncursesw5-dev
+```
 
 ### Windows
 
 For compiling and building on Windows, it's recommended to use `vcpkg` to manage library, in this case for `pdcurses`.
 
-```
+```cmd
 vcpkg install pdcurses:x64-windows
 vcpkg integrate install
 ```
