@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gpa-calculator 1.0\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-10 01:11+0800\n"
+"Report-Msgid-Bugs-To: noreply@example.com\n"
+"POT-Creation-Date: 2023-09-10 20:04+0800\n"
 "PO-Revision-Date: 2023-09-10 00:47+0800\n"
 "Last-Translator: Biblion <nixonleongkb@gmail.com>\n"
 "Language-Team: Chinese (simplified) <i18n-zh@googlegroups.com>\n"
@@ -16,251 +16,323 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main_menu.c:31 src/main_menu.c:69 src/main_menu.c:151
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:46
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:124
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:206
 msgid "GPA/CGPA CALCULATOR"
 msgstr "GPA / CGPA 计算机"
 
-#: src/main_menu.c:33
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:48
 #, c-format
 msgid "ADMIN ENTER 1\n"
 msgstr "行政人员 请打【1】\n"
 
-#: src/main_menu.c:34
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:49
 #, c-format
 msgid "STUDENT ENTER 2\n"
 msgstr "学生 请打【2】\n"
 
-#: src/main_menu.c:36 src/main_menu.c:91
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:51
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:146
 #, c-format
 msgid "EXIT ENTER %d\n"
 msgstr "要退出 请打【-1】\n"
 
-#: src/main_menu.c:37
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:52
 #, c-format
 msgid "ENTER AS ADMIN/STUDENT : "
 msgstr "进入 行政人员/学生 菜单: "
 
-#: src/main_menu.c:55
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:70
 #, c-format
 msgid "PLEASE CHOOSE THE NUMBER AGAIN: "
 msgstr "清再输入正确的号码: "
 
-#: src/main_menu.c:71
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:86
+#, c-format
+msgid "Language\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:94
+#, c-format
+msgid "Enter a number > "
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:98
+#, c-format
+msgid "%d is not a valid option. Please input again.\n"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:126
 #, c-format
 msgid "ADMINISTRATOR\n"
 msgstr "行政人员菜单\n"
 
-#: src/main_menu.c:72 src/main_menu.c:154
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:127
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:209
 #, c-format
 msgid "SCHOOL: KOLEJ PASAR\n"
 msgstr "大学: KOLEJ PASAR\n"
 
-#: src/main_menu.c:73 src/main_menu.c:155
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:128
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:210
 #, c-format
 msgid "DATE: %s,%d-%02d-%02d\n"
 msgstr "日期: %s,%d-%02d-%02d\n"
 
-#: src/main_menu.c:85
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:140
 msgid "WELCOME TO THE ADMIN SCREEN"
 msgstr "欢迎到 行政人员 菜单"
 
-#: src/main_menu.c:87
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:142
 #, c-format
 msgid "VIEW student list ENTER 1\n"
 msgstr "列出学生 输入【1】\n"
 
-#: src/main_menu.c:88
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:143
 #, c-format
 msgid "GET a student details ENTER 2\n"
 msgstr "拿学生资料 输入【2】\n"
 
-#: src/main_menu.c:89
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:144
 #, c-format
 msgid "STORE student ENTER 3\n"
 msgstr "储存学生资料 输入【3】\n"
 
-#: src/main_menu.c:92
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:147
 #, c-format
 msgid "ENTER: "
 msgstr "输入: "
 
-#: src/main_menu.c:124
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:179
 #, c-format
 msgid "ENTER THE PASSWORD: "
 msgstr "输入密码: "
 
-#: src/main_menu.c:132
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:187
 #, c-format
 msgid "PASSWORD INCORRECT\n"
 msgstr "输入错误\n"
 
-#: src/main_menu.c:133
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:188
 #, c-format
 msgid "PLEASE ENTER THE PASSWORD AGAIN(%i): "
 msgstr "清再输入密码（%d): "
 
-#: src/main_menu.c:135
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:190
 #, c-format
 msgid ""
 "!!!YOU HAVE ENTER THE INCORRECT ANSWER TOO MANY TIMES, PLEASE TRY AGAIN "
 "LATER!!!\n"
 msgstr "！！！密码输入错误太多次，清迟点重试！！！\n"
 
-#: src/main_menu.c:137
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:192
 #, c-format
 msgid ""
 "If you have forgotten the password, please contact to look for help: %s\n"
 msgstr "如果您忘记了密码，清通知: %s\n"
 
-#: src/main_menu.c:138
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:193
 #, c-format
 msgid "OR send us a email: %s\n"
 msgstr "或者邮件去: %s\n"
 
-#: src/main_menu.c:153
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:208
 #, c-format
 msgid "STUDENT\n"
 msgstr "学生菜单\n"
 
-#: src/main_menu.c:165
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:220
 #, c-format
 msgid "PLEASE ENTER YOUR STUDENT ID: "
 msgstr "请输入您的学生号: "
 
-#: src/main_menu.c:176
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:231
 #, c-format
 msgid "You entered a wrong ID (Enter %s to exit)\n"
 msgstr "您输入了错的学生号（退出清输入【%s】）\n"
 
-#: src/main_menu.c:190
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:245
 #, c-format
 msgid "DETAILS:\n"
 msgstr ""
 
-#: src/main_menu.c:192
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:247
 #, c-format
 msgid "Student ID: %s\n"
 msgstr ""
 
-#: src/main_menu.c:193
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:248
 #, c-format
 msgid "Student Name: %s\n"
 msgstr ""
 
-#: src/main_menu.c:194
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:249
 #, c-format
 msgid "Total enrolled courses: %d\n"
 msgstr ""
 
-#: src/main_menu.c:228
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:283
 #, c-format
 msgid "Sem %-*d"
 msgstr ""
 
-#: src/main_menu.c:270
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:325
 #, c-format
 msgid "GPA: %-*.2f"
 msgstr ""
 
-#: src/main_menu.c:278
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:333
 #, c-format
 msgid "CGPA: %-*.2f"
 msgstr ""
 
-#: src/gui.c:28 src/gui.c:422
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:25
+#, c-format
+msgid "Press ENTER to proceed"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:67
+msgid "MONDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:69
+msgid "TUESDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:71
+msgid "WEDNESDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:73
+msgid "THURSDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:75
+msgid "FRIDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:77
+msgid "SATURDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:79
+msgid "SUNDAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/utils.c:81
+msgid "INVALID DAY"
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:28
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:428
 msgid "Student ID"
 msgstr ""
 
-#: src/gui.c:29 src/gui.c:426
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:29
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:432
 msgid "Student Name"
 msgstr ""
 
-#: src/gui.c:30
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:30
 #, c-format
 msgid "GPA (S%d)"
 msgstr ""
 
-#: src/gui.c:31
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:31
 msgid "CGPA"
 msgstr ""
 
-#: src/gui.c:58 src/gui.c:178
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:58
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:178
 #, c-format
 msgid "Your terminal does not support color\n"
 msgstr ""
 
-#: src/gui.c:72
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:72
 #, c-format
 msgid "Screen is too small, resize to be atleast %d wide.\n"
 msgstr ""
 
-#: src/gui.c:77
+#. print title, header, footer
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:77
 msgid "Kolej Pasar Students"
 msgstr ""
 
-#: src/gui.c:195
+#. title
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:195
 msgid "Inserting Student"
 msgstr ""
 
-#: src/gui.c:223
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:223
 msgid "Do you want to add another course? "
 msgstr ""
 
-#: src/gui.c:274
+#. ask to save or not
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:280
 msgid "Save record? "
 msgstr ""
 
-#: src/gui.c:419
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:425
 msgid "Student Info"
 msgstr ""
 
-#: src/gui.c:422 src/gui.c:426 src/gui.c:435 src/gui.c:439 src/gui.c:443
-#: src/gui.c:447
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:428
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:432
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:441
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:445
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:449
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:453
 #, c-format
 msgid "%-15s: "
 msgstr ""
 
-#: src/gui.c:431 src/gui.c:455
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:437
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:461
 #, c-format
 msgid "Course %d Info"
 msgstr ""
 
-#: src/gui.c:435 src/gui.c:458
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:441
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:464
 msgid "Course code"
 msgstr ""
 
-#: src/gui.c:439 src/gui.c:461
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:445
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:467
 msgid "Semester"
 msgstr ""
 
-#: src/gui.c:443 src/gui.c:464
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:449
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:470
 msgid "Credit Hours"
 msgstr ""
 
-#: src/gui.c:447 src/gui.c:467
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:453
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:473
 msgid "Grade"
 msgstr ""
 
-#: src/gui.c:475
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:481
 msgid "YES"
 msgstr ""
 
-#: src/gui.c:481
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:487
 msgid "NO"
 msgstr ""
 
-#: src/gui.c:584
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:590
 msgid "Quit"
 msgstr ""
 
-#: src/gui.c:584
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:590
 msgid "View Details"
 msgstr ""
 
-#: src/gui.c:589
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:595
 msgid "Change Sort Mode"
 msgstr ""
 
-#: src/gui.c:594
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:600
 msgid "Scroll"
 msgstr ""
