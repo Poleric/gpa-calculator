@@ -1,7 +1,10 @@
 #include <utils.h>
 #include <string.h>
+#include <libintl.h>
 
- void clear_screen() {
+#define _(String) gettext(String)
+
+void clear_screen() {
     #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
         system("cls");
     #else
@@ -19,7 +22,7 @@ void pause() {
     /* cross platform solution to system("pause") lmao. */
 
     putchar('\n');
-    printf("Press ENTER to proceed");
+    printf(_("Press ENTER to proceed"));
     putchar('\n');
 
     getchar();
@@ -61,21 +64,21 @@ int is_valid_grade(char* grade) {
 char* get_day(int day) {
     switch (day) {
         case 0:
-            return "MONDAY";
+            return _("MONDAY");
         case 1:
-            return "TUESDAY";
+            return _("TUESDAY");
         case 2:
-            return "WEDNESDAY";
+            return _("WEDNESDAY");
         case 3:
-            return "THURSDAY";
+            return _("THURSDAY");
         case 4:
-            return "FRIDAY";
+            return _("FRIDAY");
         case 5:
-            return "SATURDAY";
+            return _("SATURDAY");
         case 6:
-            return "SUNDAY";
+            return _("SUNDAY");
         default:
-            return "INVALID DAY";
+            return _("INVALID DAY");
     }
 }
 
