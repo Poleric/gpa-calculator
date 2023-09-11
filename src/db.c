@@ -222,6 +222,52 @@ int update_sql_student_courses(sqlite3* db, SQLStudent* pSQLStudent) {
 	return EXIT_SUCCESS;
 }
 
+int delete_sql_student(sqlite3* db, SQLStudent* pSQLStudent) {
+    sqlite3_stmt* stmt;
+
+    int ret = sqlite3_prepare(
+            db,
+            "DELETE FROM students WHERE student_id=?",
+            -1,
+            &stmt,
+            NULL
+    );
+
+    if (ret != SQLITE_OK) {
+        fprintf(stderr, "delete_sql_student: Failed to execute statement: %s\n", sqlite3_errmsg(db));
+        return EXIT_FAILURE;
+    }
+
+    sqlite3_bind_text(stmt, 1, pSQLStudent->student_id, -1, NULL);
+    sqlite3_step(stmt);
+
+    sqlite3_finalize(stmt);
+    return EXIT_SUCCESS;
+}
+
+int delete_sql_student_courses(sqlite3* db, SQLStudent* pSQLStudent) {
+    sqlite3_stmt* stmt;
+
+    int ret = sqlite3_prepare(
+            db,
+            "DELETE FROM registered_courses WHERE student_id=?",
+            -1,
+            &stmt,
+            NULL
+    );
+
+    if (ret != SQLITE_OK) {
+        fprintf(stderr, "delete_sql_student_courses: Failed to execute statement: %s\n", sqlite3_errmsg(db));
+        return EXIT_FAILURE;
+    }
+
+    sqlite3_bind_text(stmt, 1, pSQLStudent->student_id, -1, NULL);
+    sqlite3_step(stmt);
+
+    sqlite3_finalize(stmt);
+    return EXIT_SUCCESS;
+}
+
 /*
     Helper functions
 */

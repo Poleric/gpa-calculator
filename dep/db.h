@@ -32,6 +32,9 @@ int get_student_courses(sqlite3* db, char* stud_id, SQLCourse** buff, size_t buf
 int update_sql_student(sqlite3* db, SQLStudent* pSQLStudent);
 int update_sql_student_courses(sqlite3* db, SQLStudent* pSQLStudent);
 
+int delete_sql_student(sqlite3* db, SQLStudent* pSQLStudent);
+int delete_sql_student_courses(sqlite3* db, SQLStudent* pSQLStudent);
+
 // helper functions
 int get_number_of_courses(sqlite3* db, char* stud_id);
 int get_number_of_students(sqlite3* db);
