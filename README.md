@@ -1,4 +1,5 @@
 # GPA Calculator
+
 A GPA calculator and interface written in C.
 
 ## Building
@@ -35,5 +36,24 @@ For compiling and building on Windows, it's recommended to use `vcpkg` to manage
 ```cmd
 > vcpkg install pdcurses:x64-windows
 > vcpkg install gettext:x64-windows
-> vcpkg integrate install
+```
+
+In order to use vcpkg with Visual Studio,
+run the following command (may require administrator elevation):
+
+```cmd
+> .\vcpkg\vcpkg integrate install
+```
+
+#### Visual Studio Code with CMake Tools
+
+Adding the following to your workspace `settings.json` will make
+CMake Tools automatically use vcpkg for libraries:
+
+```json
+{
+  "cmake.configureSettings": {
+    "CMAKE_TOOLCHAIN_FILE": "[vcpkg root]/scripts/buildsystems/vcpkg.cmake"
+  }
+}
 ```
