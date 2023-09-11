@@ -34,7 +34,7 @@ int setenv(const char* name, const char* value, int overwrite)
 // language defines
 #define ENGLISH_UK "en_GB"
 #define ENGLISH_US "en_US"
-#define CHINESE_CN "zh_CN"
+#define CHINESE_CN "zh_CN.UTF-8"
 #define MALAY_MY "ms_MY"
 #define SUPPORTED_LANGUAGES_TEXT {"English (United Kingdom)", "English (United State)", "简体中文", "Bahasa Melayu"}
 #define SUPPORTED_LANGUAGES_CODES {ENGLISH_UK, ENGLISH_US, CHINESE_CN, MALAY_MY}
@@ -51,7 +51,10 @@ int main() {
 
     clear_screen();
     locale = promptLanguage();
-    setLocale(locale);
+    locale = setLocale(locale);
+    if (locale == NULL) {
+        fprintf(stderr, _("Failed to set language"));
+    }
 
     do {
         clear_screen();
@@ -125,7 +128,6 @@ char* setLocale(char* lang_code) {
     set_locale = setlocale(LC_ALL, "");
     bindtextdomain("gpa-calculator", LOCALE_DIR);
     textdomain("gpa-calculator");
-
     return set_locale;
 }
 
