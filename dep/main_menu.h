@@ -12,6 +12,8 @@ void student();
 char* promptLanguage();
 char* setLocale(char* lang_code);
 void getStudentDetailsScreen();
+SQLStudent* promptStudentID();
+void promptDeletion();
 void printFullStudentDetails(SQLStudent* student);
 
 void printManyChar(char character, int length);

@@ -156,6 +156,7 @@ void admin(){
         printf(_("VIEW student list ENTER 1\n"));
         printf(_("GET a student details ENTER 2\n"));
         printf(_("STORE student ENTER 3\n"));
+        printf(_("DELETE student ENTER 4\n"));
         printf("\n");
         printf(_("EXIT ENTER %d\n"), EXIT_FLAG);
         printf(_("ENTER: "));
@@ -175,6 +176,8 @@ void admin(){
                     insert_student_menu(db);
                     break;
                 case 4:
+                    clear_screen();
+                    promptDeletion();
                     break;
                 case EXIT_FLAG:
                     exit = 1;
@@ -226,17 +229,33 @@ void student(){
 }
 
 void getStudentDetailsScreen() {
-    char studentID[15];
     SQLStudent *student;
+
+    student = promptStudentID();
+
+    if (student == NULL) {  // user select exit
+        return;
+    }
+
+    putchar('\n');
+    printFullStudentDetails(student);
+
+    free_student(student);  //free memory
+    pause();  // pause screen to see
+}
+
+SQLStudent* promptStudentID() {
+    char studentID[15];
     const char* EXIT_STR = "-1";
+    SQLStudent *student;
 
     do {
-        printf(_("PLEASE ENTER YOUR STUDENT ID: "));
+        printf(_("PLEASE ENTER THE STUDENT ID: "));
         fgets(studentID, ARRAY_SIZE(studentID), stdin);  // gets is removed from C11
         studentID[strcspn(studentID, "\n")] = '\0';  // remove trailing newline from fgets
 
         if (strcmp(studentID, EXIT_STR) == 0) {
-            break;
+            return NULL;
         }
 
         student = get_student(db, studentID);  //read student from database
@@ -246,13 +265,49 @@ void getStudentDetailsScreen() {
             continue;
         }
 
-        putchar('\n');
-        printFullStudentDetails(student);
-
-        free_student(student);  //free memory
-        pause();  // pause screen to see
-        return;
+        return student;
     } while(1);
+}
+
+void promptDeletion() {
+    SQLStudent* student;
+    int input;
+
+    student = promptStudentID();
+
+    if (student == NULL) {  // user select exit
+        return;
+    }
+
+    putchar('\n');
+    printFullStudentDetails(student);
+
+    putchar('\n');
+    puts(_("Are you sure you want to delete this entry?"));
+    puts(_("ENTER 0 to CANCEL"));
+    puts(_("ENTER 1 to DELETE"));
+    putchar('\n');
+
+    do {
+        printf(_("> "));  // this is a number input
+
+        scanf("%d", &input);
+        flush_stdin();
+
+        switch (input) {
+            case 0:
+                break;
+            case 1:
+                delete_sql_student_courses(db, student);
+                delete_sql_student(db, student);
+                input = 0;
+                break;
+            default:
+                puts(_("The number you've entered is invalid. Please enter again."));
+        }
+    } while(input);  // input != 0
+
+    free_student(student);
 }
 
 void printFullStudentDetails(SQLStudent* student) {
