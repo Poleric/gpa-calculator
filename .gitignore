@@ -585,4 +585,6 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/c,cmake,visualstudio,clion
 
 build/
-*.mo    # mo files, is binaries
+.idea/
+# mo files binaries
+*.mo
