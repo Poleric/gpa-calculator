@@ -288,8 +288,19 @@ void printStudentCoursesTable(SQLStudent* student) {
     printLineWithManyCharWithSeperators('-', COLUMN_WIDTH, '|', max_sem, TRUE);
 
     SQLCourse*** courses_each_sem = calloc(max_sem, sizeof(SQLCourse**));
+    if (courses_each_sem == NULL) {
+        log_alloc_error("printStudentCoursesTable", "courses_each_sem");
+        return;
+    }
+
     for (int i = 0; i < max_sem; i++) {
-        courses_each_sem[i] = calloc(student->number_of_courses, sizeof(SQLCourse*));
+        SQLCourse* courses = calloc(student->number_of_courses, sizeof(SQLCourse*));
+        if (courses == NULL) {
+            log_alloc_error("printStudentCoursesTable", "courses");
+            return;
+        }
+
+        courses_each_sem[i] = courses;
         filter_sem_courses(i + 1, (Course**)student->pSQLCourses, student->number_of_courses,(Course **) courses_each_sem[i]);
     }
     // line 3++

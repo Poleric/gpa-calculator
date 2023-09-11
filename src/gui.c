@@ -406,6 +406,10 @@ int init_rows(sqlite3* db) {
         free_courses(pSQLCourses, number_of_courses);
 
         pRow = malloc(sizeof(RowData));
+        if (pRow == NULL) {
+            log_alloc_error("init_rows", "pRow");
+            return EXIT_FAILURE;
+        }
         pRow->studentID = stud_id;
         pRow->studentName = stud_name;
         pRow->gpas = gpas;

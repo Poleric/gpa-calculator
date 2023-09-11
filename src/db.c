@@ -328,6 +328,10 @@ sqlite3_stmt* get_students_stmt(sqlite3* db, const char* extra_sql) {
     sqlite3_stmt* stmt;
     char* base_cmd = "SELECT * FROM students";
     char* sql_cmd = malloc(strlen(base_cmd) + (extra_sql != NULL ? strlen(extra_sql) + 2 : 1) + 1);
+    if (sql_cmd == NULL) {
+        log_alloc_error("get_student_stmt", "sql_cmd");
+        return NULL;
+    }
 
     // build sql_cmd
     strcpy(sql_cmd, base_cmd);
@@ -357,6 +361,10 @@ sqlite3_stmt* get_courses_stmt(sqlite3* db, const char* extra_sql) {
     sqlite3_stmt* stmt;
     char* base_cmd = "SELECT * FROM registered_courses";
     char* sql_cmd = malloc(strlen(base_cmd) + (extra_sql != NULL ? strlen(extra_sql) + 2 : 1) + 1);
+    if (sql_cmd == NULL) {
+        log_alloc_error("get_courses_stmt", "sql_cmd");
+        return NULL;
+    }
 
     // build sql_cmd
     strcpy(sql_cmd, base_cmd);
@@ -386,6 +394,10 @@ SQLStudent* build_sql_student_from_stmt(sqlite3_stmt* stmt) {
     /* Note: The returned SQLStudent only have fields that are retrievable from the get_student stmt, ie only student_id & name. < SQLCourses need to be manually added afterwards > */
 
     SQLStudent* pSQLStudent = malloc(sizeof(SQLStudent));
+    if (pSQLStudent == NULL) {
+        log_alloc_error("build_sql_student_from_stmt", "pSQLStudent");
+        return NULL;
+    }
 
     // duplicating string because pointer is destroyed after sql_finalize
 

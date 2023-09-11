@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <utils.h>
 #include <calculation.h>
 
 
@@ -37,9 +38,18 @@ float get_gpa_from_courses(Course** pCourses, int number_of_courses, int sem) {
     return total_quality_points / total_credit_hours;
 }
 
-void get_gpas_from_courses(Course** pCourses, int number_of_courses, float* buff, int buff_len) {
+int get_gpas_from_courses(Course** pCourses, int number_of_courses, float* buff, int buff_len) {
     float* total_quality_points = calloc(buff_len, sizeof(float));
+    if (total_quality_points == NULL) {
+        log_alloc_error("get_gpas_from_courses", "total_quality_points");
+        return EXIT_FAILURE;
+    }
     int* total_credit_hours = calloc(buff_len, sizeof(int));
+    if (total_credit_hours == NULL) {
+        log_alloc_error("get_gpas_from_courses", "total_credit_hours");
+        return EXIT_FAILURE;
+    }
+
     for (int i = 0; i < number_of_courses; i++) {
         if (pCourses[i] != NULL) {
             total_quality_points[pCourses[i]->sem - 1] += get_grade_point(pCourses[i]->grade) * pCourses[i]->credit_hours;  // grade_point * credit_hours
@@ -70,8 +80,8 @@ float get_student_gpa(Student* pStudent, int sem) {
     return get_gpa_from_courses(pStudent->pCourses, pStudent->number_of_courses, sem);
 }
 
-void get_student_gpas(Student* pStudent, float* buff, int buff_len) {
-    get_gpas_from_courses(pStudent->pCourses, pStudent->number_of_courses, buff, buff_len);
+int get_student_gpas(Student* pStudent, float* buff, int buff_len) {
+    return get_gpas_from_courses(pStudent->pCourses, pStudent->number_of_courses, buff, buff_len);
 }
 
 float get_student_cgpa(Student* pStudent) {
