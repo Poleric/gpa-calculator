@@ -92,6 +92,7 @@ int student_list_menu(sqlite3* db) {
     student_list_win = newwin(field_data.height, field_data.width, 2, 0);
     keypad(student_list_win, TRUE);
     leaveok(student_list_win, TRUE);
+    curs_set(0);
     do {
         if (update) {
             wstandout_line(stdscr, 1, 1);
