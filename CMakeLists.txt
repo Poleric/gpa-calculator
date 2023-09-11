@@ -15,6 +15,11 @@ set(SOURCES
     ${CMAKE_SOURCE_DIR}/src/main_menu.c
 )
 
+if (WIN32 OR MSVC)
+    add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")  # chinese characters shenaningans
+    add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+endif()
+
 add_compile_definitions("LOCALE_DIR=\"${CMAKE_SOURCE_DIR}/i18n\"")
 add_executable(gpa-calculator ${SOURCES})
 
