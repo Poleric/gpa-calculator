@@ -308,7 +308,7 @@ void printStudentCoursesTable(SQLStudent* student) {
     }
 
     for (int i = 0; i < max_sem; i++) {
-        SQLCourse* courses = calloc(student->number_of_courses, sizeof(SQLCourse*));
+        SQLCourse** courses = calloc(student->number_of_courses, sizeof(SQLCourse*));
         if (courses == NULL) {
             log_alloc_error("printStudentCoursesTable", "courses");
             return;
