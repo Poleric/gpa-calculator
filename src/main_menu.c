@@ -15,6 +15,19 @@
 #define LOCALE_DIR "/usr/local/share/locale"
 #endif
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
+// windows no setenv
+int setenv(const char* name, const char* value, int overwrite)
+{
+    int errcode = 0;
+    if (!overwrite) {
+        size_t envsize = 0;
+        errcode = getenv_s(&envsize, NULL, 0, name);
+        if (errcode || envsize) return errcode;
+    }
+    return _putenv_s(name, value);
+}
+#endif
 
 #define EXIT_FLAG (-1)
 
@@ -93,6 +106,7 @@ char* promptLanguage() {
     do {
         printf(_("Enter a number > "));
         scanf("%d", &input_num);
+        flush_stdin();
 
         if (input_num > ARRAY_SIZE(supported_langs))
             printf(_("%d is not a valid option. Please input again.\n"), input_num);
@@ -106,7 +120,7 @@ char* promptLanguage() {
 char* setLocale(char* lang_code) {
     char* set_locale;
 
-    setenv("LANGUAGE", lang_code, 1);
+    setenv("LANG", lang_code, 1);
     setenv("LANGUAGE", lang_code, 1);
     set_locale = setlocale(LC_ALL, "");
     bindtextdomain("gpa-calculator", LOCALE_DIR);
