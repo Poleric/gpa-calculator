@@ -339,8 +339,8 @@ void promptDeletion() {
 void printFullStudentDetails(SQLStudent* student) {
     printf(_("DETAILS:\n"));
     printf("================================================\n");
-    printf(_("Student ID: %s\n"), student->name);
-    printf(_("Student Name: %s\n"), student->student_id);
+    printf(_("Student ID: %s\n"), student->student_id);
+    printf(_("Student Name: %s\n"), student->name);
     printf(_("Total enrolled courses: %d\n"), student->number_of_courses);
 
     printStudentCoursesTable(student);
