@@ -142,7 +142,7 @@ char* setLocale(char* lang_code) {
     setenv("LANGUAGE", lang_code, 1);
     set_locale = setlocale(LC_ALL, "");
     if (set_locale == NULL) {  // add .UTF-8 if fail
-        char lang_utf[strlen(lang_code) + 1 + 6];
+        char lang_utf[ARRAY_SIZE(lang_code) + 6];
 
         strcpy(lang_utf, lang_code);
         strcat(lang_utf, ".UTF-8");
