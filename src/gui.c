@@ -112,6 +112,7 @@ int student_list_menu(sqlite3* db) {
         }
 
         input = wgetch(student_list_win);
+        SQLStudent* stud; // used for details and delete
         switch(input) {
             // scroll up and down
             case KEY_UP:
@@ -155,11 +156,31 @@ int student_list_menu(sqlite3* db) {
                 endwin();
 
                 clear_screen();
-                SQLStudent* stud = get_student(db, field_data.rows[selection].studentID);
+                stud = get_student(db, field_data.rows[selection].studentID);
                 printFullStudentDetails(stud);
                 free_student(stud);
                 getchar();
 
+                reset_prog_mode();
+                refresh();
+                break;
+            case 'd':
+                def_prog_mode();
+                endwin();
+
+                clear_screen();
+                stud = get_student(db, field_data.rows[selection].studentID);
+                deleteStudent(stud);
+                free_student(stud);
+
+                free_rows();
+
+                max_students = get_number_of_students(db);
+                field_data.rows = calloc(max_students, sizeof(RowData));
+                field_data.number_of_rows = max_students;
+                init_rows(db);
+
+                update = 1;
                 reset_prog_mode();
                 refresh();
                 break;
