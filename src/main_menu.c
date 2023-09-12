@@ -16,6 +16,7 @@
 #endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
+#include <Windows.h>
 // windows no setenv
 int setenv(const char* name, const char* value, int overwrite)
 {
@@ -32,10 +33,17 @@ int setenv(const char* name, const char* value, int overwrite)
 #define EXIT_FLAG (-1)
 
 // language defines
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
+#define ENGLISH_UK "English_UnitedKingdom"
+#define ENGLISH_US "English_UnitedStates"
+#define CHINESE_CN "Chinese-Simplified"
+#define MALAY_MY "Malay"
+#else
 #define ENGLISH_UK "en_GB"
 #define ENGLISH_US "en_US"
 #define CHINESE_CN "zh_CN"
 #define MALAY_MY "ms_MY"
+#endif
 #define SUPPORTED_LANGUAGES_TEXT {"English (United Kingdom)", "English (United State)", "简体中文", "Bahasa Melayu"}
 #define SUPPORTED_LANGUAGES_CODES {ENGLISH_UK, ENGLISH_US, CHINESE_CN, MALAY_MY}
 
@@ -45,6 +53,11 @@ int main() {
     // initialize locales
 	int id, exit = 0;
     char* locale;
+
+    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
+    SetConsoleOutputCP(CP_UTF8)
+    SetConsoleCP(CP_UTF8)
+    #endif
 
 	sqlite3_open("students.db",&db);  //connect database
     init_student_db(db);
