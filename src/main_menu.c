@@ -16,6 +16,7 @@
 #endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
+#include <Windows.h>
 // windows no setenv
 int setenv(const char* name, const char* value, int overwrite)
 {
@@ -32,10 +33,17 @@ int setenv(const char* name, const char* value, int overwrite)
 #define EXIT_FLAG (-1)
 
 // language defines
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
+#define ENGLISH_UK "English_UnitedKingdom"
+#define ENGLISH_US "English_UnitedStates"
+#define CHINESE_CN "Chinese-Simplified"
+#define MALAY_MY "Malay"
+#else
 #define ENGLISH_UK "en_GB"
 #define ENGLISH_US "en_US"
-#define CHINESE_CN "zh_CN.UTF-8"
+#define CHINESE_CN "zh_CN"
 #define MALAY_MY "ms_MY"
+#endif
 #define SUPPORTED_LANGUAGES_TEXT {"English (United Kingdom)", "English (United State)", "简体中文", "Bahasa Melayu"}
 #define SUPPORTED_LANGUAGES_CODES {ENGLISH_UK, ENGLISH_US, CHINESE_CN, MALAY_MY}
 
@@ -46,6 +54,11 @@ int main() {
 	int id, exit = 0;
     char* locale;
 
+    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
+    SetConsoleOutputCP(CP_UTF8)
+    SetConsoleCP(CP_UTF8)
+    #endif
+
 	sqlite3_open("students.db",&db);  //connect database
     init_student_db(db);
 
@@ -53,7 +66,9 @@ int main() {
     locale = promptLanguage();
     locale = setLocale(locale);
     if (locale == NULL) {
-        fprintf(stderr, _("Failed to set language"));
+        fprintf(stderr, _("Failed to set language. Does your system does not support this language?"));
+        putchar('\n');
+        pause();
     }
 
     do {
@@ -126,6 +141,14 @@ char* setLocale(char* lang_code) {
     setenv("LANG", lang_code, 1);
     setenv("LANGUAGE", lang_code, 1);
     set_locale = setlocale(LC_ALL, "");
+    if (set_locale == NULL) {  // add .UTF-8 if fail
+        char lang_utf[strlen(lang_code) + 1 + 6];
+
+        strcpy(lang_utf, lang_code);
+        strcat(lang_utf, ".UTF-8");
+
+        set_locale = setlocale(LC_ALL, lang_utf);
+    }
     bindtextdomain("gpa-calculator", LOCALE_DIR);
     textdomain("gpa-calculator");
     return set_locale;
@@ -316,8 +339,8 @@ void promptDeletion() {
 void printFullStudentDetails(SQLStudent* student) {
     printf(_("DETAILS:\n"));
     printf("================================================\n");
-    printf(_("Student ID: %s\n"), student->name);
-    printf(_("Student Name: %s\n"), student->student_id);
+    printf(_("Student ID: %s\n"), student->student_id);
+    printf(_("Student Name: %s\n"), student->name);
     printf(_("Total enrolled courses: %d\n"), student->number_of_courses);
 
     printStudentCoursesTable(student);
