@@ -55,8 +55,8 @@ int main() {
     char* locale;
 
     #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
-    SetConsoleOutputCP(CP_UTF8)
-    SetConsoleCP(CP_UTF8)
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
     #endif
 
 	sqlite3_open("students.db",&db);  //connect database
