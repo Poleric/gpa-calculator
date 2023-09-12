@@ -152,6 +152,7 @@ int student_list_menu(sqlite3* db) {
                 break;
             case KEY_ENTER:
             case '\n':
+            case '\r':
                 def_prog_mode();
                 endwin();
 
@@ -211,13 +212,13 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
     char *student_id = NULL, *student_name = NULL;
     Student student;
     Course** courses = NULL;
+    int win_w = COLS - 4, win_h = LINES - 4, current_row = 0;
 
     // title
-    wprintw_center(stdscr, COLS, _("Inserting Student"));
+    wprintw_center(stdscr, win_w, _("Inserting Student"));
     wstandout_line(stdscr, 0, 0);
     refresh();
     // fields
-    int win_w = COLS-4, win_h = LINES-4, current_row = 0;
     insert_student_win = newpad(100, win_w);
 
     InsertFieldCoords insertFieldCoords;  // store info
@@ -239,7 +240,6 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
     int exit = 0, number_of_courses = 0;
     int y, x;
     keypad(insert_student_win, TRUE);
-
     do {
         int current_course = (insert_field_data.current_selection - 2) / insert_field_data.number_of_course_fields;  // starts at 0
         mvwprintw(stdscr, 0, 0, "%d", insert_field_data.current_selection);
@@ -284,6 +284,7 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
             switch (buff_ch) {
                 case KEY_ENTER:
                 case '\n':
+                case '\r':
                     wclrtoeol(insert_student_win);
                     stop_input = 1;
                     break;
@@ -666,6 +667,7 @@ int yes_or_no_selector(WINDOW* win, int default_option) {
                 break;
             case KEY_ENTER:
             case '\n':
+            case '\r':
                 wmove(win, y, 0);
                 wclrtoeol(win);
 
