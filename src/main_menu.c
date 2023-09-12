@@ -126,7 +126,7 @@ char* promptLanguage() {
         scanf("%d", &input_num);
         flush_stdin();
 
-        if (input_num > ARRAY_SIZE(supported_langs))
+        if (input_num <= 0 || input_num > ARRAY_SIZE(supported_langs))
             printf(_("%d is not a valid option. Please input again.\n"), input_num);
         else
             break;
