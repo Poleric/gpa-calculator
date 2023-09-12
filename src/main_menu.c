@@ -297,7 +297,6 @@ SQLStudent* promptStudentID() {
 
 void promptDeletion() {
     SQLStudent* student;
-    int input;
 
     student = promptStudentID();
 
@@ -306,8 +305,16 @@ void promptDeletion() {
     }
 
     putchar('\n');
-    printFullStudentDetails(student);
+    deleteStudent(student);
 
+    free_student(student);
+}
+
+void deleteStudent(SQLStudent* student) {
+    /* asks confirmation as well */
+    int input;
+
+    printFullStudentDetails(student);
     putchar('\n');
     puts(_("Are you sure you want to delete this entry?"));
     puts(_("ENTER 0 to CANCEL"));
@@ -332,8 +339,6 @@ void promptDeletion() {
                 puts(_("The number you've entered is invalid. Please enter again."));
         }
     } while(input);  // input != 0
-
-    free_student(student);
 }
 
 void printFullStudentDetails(SQLStudent* student) {
