@@ -34,7 +34,7 @@ int setenv(const char* name, const char* value, int overwrite)
 // language defines
 #define ENGLISH_UK "en_GB"
 #define ENGLISH_US "en_US"
-#define CHINESE_CN "zh_CN.UTF-8"
+#define CHINESE_CN "zh_CN"
 #define MALAY_MY "ms_MY"
 #define SUPPORTED_LANGUAGES_TEXT {"English (United Kingdom)", "English (United State)", "简体中文", "Bahasa Melayu"}
 #define SUPPORTED_LANGUAGES_CODES {ENGLISH_UK, ENGLISH_US, CHINESE_CN, MALAY_MY}
@@ -53,7 +53,9 @@ int main() {
     locale = promptLanguage();
     locale = setLocale(locale);
     if (locale == NULL) {
-        fprintf(stderr, _("Failed to set language"));
+        fprintf(stderr, _("Failed to set language. Does your system does not support this language?"));
+        putchar('\n');
+        pause();
     }
 
     do {
@@ -126,6 +128,14 @@ char* setLocale(char* lang_code) {
     setenv("LANG", lang_code, 1);
     setenv("LANGUAGE", lang_code, 1);
     set_locale = setlocale(LC_ALL, "");
+    if (set_locale == NULL) {  // add .UTF-8 if fail
+        char lang_utf[strlen(lang_code) + 1 + 6];
+
+        strcpy(lang_utf, lang_code);
+        strcat(lang_utf, ".UTF-8");
+
+        set_locale = setlocale(LC_ALL, lang_utf);
+    }
     bindtextdomain("gpa-calculator", LOCALE_DIR);
     textdomain("gpa-calculator");
     return set_locale;
