@@ -56,17 +56,17 @@ msgstr "清再输入正确的号码: "
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:102
 #, c-format
 msgid "Language\n"
-msgstr ""
+msgstr "语言\n"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:110
 #, c-format
 msgid "Enter a number > "
-msgstr ""
+msgstr "输入号码 > "
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:115
 #, c-format
 msgid "%d is not a valid option. Please input again.\n"
-msgstr ""
+msgstr "%d 不是有效选项。 请重新输入。\n"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:142
 #, c-format
@@ -77,7 +77,7 @@ msgstr "行政人员菜单\n"
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:228
 #, c-format
 msgid "SCHOOL: KOLEJ PASAR\n"
-msgstr "大学: KOLEJ PASAR\n"
+msgstr "大学: 巴刹学院\n"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:144
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:229
@@ -127,7 +127,7 @@ msgstr "输入错误\n"
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:207
 #, c-format
 msgid "PLEASE ENTER THE PASSWORD AGAIN(%i): "
-msgstr "清再输入密码（%d): "
+msgstr "清再输入密码（%i): "
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:209
 #, c-format
@@ -164,149 +164,149 @@ msgstr "您输入了错的学生号（退出清输入【%s】）\n"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:288
 msgid "Are you sure you want to delete this entry?"
-msgstr ""
+msgstr "您确定要删除此条目吗？"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:289
 msgid "ENTER 0 to CANCEL"
-msgstr ""
+msgstr "输入 0 取消"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:290
 msgid "ENTER 1 to DELETE"
-msgstr ""
+msgstr "输入 1 删除"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:294
 #, c-format
 msgid "> "
-msgstr ""
+msgstr "> "
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:308
 msgid "The number you've entered is invalid. Please enter again."
-msgstr ""
+msgstr "您输入的号码无效。 请再次输入。"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:316
 #, c-format
 msgid "DETAILS:\n"
-msgstr ""
+msgstr "详细信息：\n"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:318
 #, c-format
 msgid "Student ID: %s\n"
-msgstr ""
+msgstr "学生 ID: %s\n"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:319
 #, c-format
 msgid "Student Name: %s\n"
-msgstr ""
+msgstr "学生姓名: %s\n"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:320
 #, c-format
 msgid "Total enrolled courses: %d\n"
-msgstr ""
+msgstr "注册课程总数：%d\n"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:354
 #, c-format
 msgid "Sem %-*d"
-msgstr ""
+msgstr "学期 %-*d"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:407
 #, c-format
 msgid "GPA: %-*.2f"
-msgstr ""
+msgstr "GPA: %-*.2f"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:415
 #, c-format
 msgid "CGPA: %-*.2f"
-msgstr ""
+msgstr "CGPA: %-*.2f"
 
 #: /home/biblion/Code/C/gpa-calculator/src/utils.c:25
 #, c-format
 msgid "Press ENTER to proceed"
-msgstr ""
+msgstr "按 ENTER 继续"
 
 #: /home/biblion/Code/C/gpa-calculator/src/utils.c:67
 msgid "MONDAY"
-msgstr ""
+msgstr "星期一"
 
 #: /home/biblion/Code/C/gpa-calculator/src/utils.c:69
 msgid "TUESDAY"
-msgstr ""
+msgstr "星期二"
 
 #: /home/biblion/Code/C/gpa-calculator/src/utils.c:71
 msgid "WEDNESDAY"
-msgstr ""
+msgstr "星期三"
 
 #: /home/biblion/Code/C/gpa-calculator/src/utils.c:73
 msgid "THURSDAY"
-msgstr ""
+msgstr "星期四"
 
 #: /home/biblion/Code/C/gpa-calculator/src/utils.c:75
 msgid "FRIDAY"
-msgstr ""
+msgstr "星期五"
 
 #: /home/biblion/Code/C/gpa-calculator/src/utils.c:77
 msgid "SATURDAY"
-msgstr ""
+msgstr "星期六"
 
 #: /home/biblion/Code/C/gpa-calculator/src/utils.c:79
 msgid "SUNDAY"
-msgstr ""
+msgstr "星期日"
 
 #: /home/biblion/Code/C/gpa-calculator/src/utils.c:81
 msgid "INVALID DAY"
-msgstr ""
+msgstr "无效日"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:28
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:433
 msgid "Student ID"
-msgstr ""
+msgstr "学生卡号"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:29
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:437
 msgid "Student Name"
-msgstr ""
+msgstr "学生名字"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:30
 #, c-format
 msgid "GPA (S%d)"
-msgstr ""
+msgstr "GPA (S%d)"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:31
 msgid "CGPA"
-msgstr ""
+msgstr "CGPA"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:58
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:179
 #, c-format
 msgid "Your terminal does not support color\n"
-msgstr ""
+msgstr "您的终端不支持颜色\n"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:72
 #, c-format
 msgid "Screen is too small, resize to be atleast %d wide.\n"
-msgstr ""
+msgstr "屏幕太小，请将大小调整为至少 %d 宽。\n"
 
 #. print title, header, footer
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:77
 msgid "Kolej Pasar Students"
-msgstr ""
+msgstr "刹学院学生"
 
 #. title
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:196
 msgid "Inserting Student"
-msgstr ""
+msgstr "插入学生"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:224
 msgid "Do you want to add another course? "
-msgstr ""
+msgstr "您想添加另一门课程吗？"
 
 #. ask to save or not
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:281
 msgid "Save record? "
-msgstr ""
+msgstr "保存记录吗？"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:430
 msgid "Student Info"
-msgstr ""
+msgstr "学生信息"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:433
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:437
@@ -316,54 +316,54 @@ msgstr ""
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:458
 #, c-format
 msgid "%-15s: "
-msgstr ""
+msgstr "%-15s: "
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:442
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:466
 #, c-format
 msgid "Course %d Info"
-msgstr ""
+msgstr "课程 %d 信息"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:446
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:469
 msgid "Course code"
-msgstr ""
+msgstr "科目编号"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:450
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:472
 msgid "Semester"
-msgstr ""
+msgstr "学期"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:454
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:475
 msgid "Credit Hours"
-msgstr ""
+msgstr "学分"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:458
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:478
 msgid "Grade"
-msgstr ""
+msgstr "等级"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:486
 msgid "YES"
-msgstr ""
+msgstr "是"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:492
 msgid "NO"
-msgstr ""
+msgstr "否"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:595
 msgid "Quit"
-msgstr ""
+msgstr "离开"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:595
 msgid "View Details"
-msgstr ""
+msgstr "查看详情"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:600
 msgid "Change Sort Mode"
-msgstr ""
+msgstr "更改排序模式"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:605
 msgid "Scroll"
-msgstr ""
+msgstr "滚动"
