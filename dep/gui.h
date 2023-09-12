@@ -28,6 +28,14 @@ typedef struct InsertFieldCoords {
     int studentIdY, studentIdX, studentNameY, studentNameX, courseCodeY, courseCodeX, semY, semX, creditHoursY, creditHoursX, gradeY, gradeX;
 } InsertFieldCoords;
 
+typedef struct InsertFieldData {
+    InsertFieldCoords insertFieldCoords;
+    int current_selection;
+    int number_of_course_fields;
+
+    int pad_current_row,  pad_height, pad_width;
+} InsertFieldData;
+
 // main
 int student_list_menu(sqlite3* db);
 int insert_student_menu(sqlite3* db);
@@ -40,6 +48,9 @@ int init_rows(sqlite3* db);
 void wprint_initial_insert_student_menu(WINDOW* win, InsertFieldCoords* insertFieldCoords);
 void wprint_course_insert_field(WINDOW* win, int n);
 int yes_or_no_selector(WINDOW* win, int default_option);
+void move_to_inputting(WINDOW* win);
+int validate_input(char * input);
+void auto_scroll();
 
 // helper functons
 static inline int truncate_str(char* string, size_t len);

@@ -34,7 +34,9 @@
 
 // used by student_list_menu
 WINDOW* student_list_win;
+WINDOW* insert_student_win;
 FieldData field_data;
+InsertFieldData insert_field_data;
 
 int sort_gpa_sem;  // workaround for compare_gpa by semester.
 const int N_COLOR = 3;
@@ -181,105 +183,228 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
     }
     start_color(); init_color_pairs();
     noecho();
-    scrollok(stdscr, TRUE);
-
-    Student student;
-    Course** courses = NULL;
-    InsertFieldCoords insertFieldCoords;
+    raw();
+    curs_set(1);
 
     // inputs
-    char student_id[20], student_name[64];
-    char course_code[15], grade[3];
-    int sem, credit_hours;
+    char *student_id = NULL, *student_name = NULL;
+    Student student;
+    Course** courses = NULL;
 
     // title
     wprintw_center(stdscr, COLS, _("Inserting Student"));
     wstandout_line(stdscr, 0, 0);
-    // fields
-    move(2, 0);
-    wprint_initial_insert_student_menu(stdscr, &insertFieldCoords);
     refresh();
+    // fields
+    int win_w = COLS-4, win_h = LINES-4, current_row = 0;
+    insert_student_win = newpad(100, win_w);
 
-    echo();  // enable back display typed characters
-    // accept student info
+    InsertFieldCoords insertFieldCoords;  // store info
+    wprint_initial_insert_student_menu(insert_student_win, &insertFieldCoords);
+    prefresh(insert_student_win, current_row, 0, 2, 2, 2+win_h, 2+win_w);
+
+    insert_field_data = (InsertFieldData){
+            insertFieldCoords,
+            0,
+            4,
+            current_row,
+            win_h,
+            win_w
+    };
+
+    // declaration for inputing
+    char buffer[60];
+    int buff_ch, n;
+    int exit = 0, number_of_courses = 0;
+    int y, x;
+    keypad(insert_student_win, TRUE);
+
     do {
-        move(insertFieldCoords.studentIdY, insertFieldCoords.studentIdX);
-        clrtoeol();
-        getnstr(student_id, ARRAY_SIZE(student_id));
-    } while(student_id[0] == '\0');
-    do {
-        move(insertFieldCoords.studentNameY, insertFieldCoords.studentNameX);
-        clrtoeol();
-        getnstr(student_name, ARRAY_SIZE(student_name));
-    } while(student_name[0] == '\0');
+        int current_course = (insert_field_data.current_selection - 2) / insert_field_data.number_of_course_fields;  // starts at 0
+        mvwprintw(stdscr, 0, 0, "%d", insert_field_data.current_selection);
+        refresh();
 
-    const int FIELD_HEIGHT = 5;
-    void * tmp;  // for checking alloc ok or not
-    // accept course(s) info
-    int number_of_courses = 0, selection = 0;
-    do {  // might be multiple courses
-        if (number_of_courses != 0) {
-            move((insertFieldCoords.courseCodeY - 1) + (FIELD_HEIGHT + 1) * number_of_courses, 0);
+        if (current_course == number_of_courses) {  // if no course, make new
+            Course **tmp = realloc(courses, (number_of_courses + 1) * sizeof(Course *));
+            if (tmp == NULL) {
+                log_alloc_error("insert_student_name", "courses");
+                free(courses);
+                clear();
+                endwin();
+                return EXIT_FAILURE;
+            }
+            courses = tmp;
 
-            wprintw_center(stdscr, COLS - 8, _("Do you want to add another course? "));
-            if (!yes_or_no_selector(stdscr, 1))
+            // build course
+            Course *course = malloc(sizeof(Course));
+            if (course == NULL) {
+                log_alloc_error("insert_student_menu", "course");
+                return EXIT_FAILURE;
+            }
+            courses[current_course] = course;
+
+            // init with default, used to validate later
+            courses[current_course]->course_code = NULL;
+            courses[current_course]->sem = 0;
+            courses[current_course]->credit_hours = 0;
+            courses[current_course]->grade = NULL;
+            number_of_courses++;
+        }
+
+        // accept input
+        n = 0;
+        move_to_inputting(insert_student_win);
+        int stop_input = 0;
+        do {
+            getyx(insert_student_win, y, x);
+            prefresh(insert_student_win, insert_field_data.pad_current_row, 0, 2, 2, 2+insert_field_data.pad_height, 2+insert_field_data.pad_width);
+            buff_ch = wgetch(insert_student_win);
+
+            switch (buff_ch) {
+                case KEY_ENTER:
+                case '\n':
+                    wclrtoeol(insert_student_win);
+                    stop_input = 1;
+                    break;
+                case 3: // ctrl-C
+                    stop_input = 1;
+                    exit = 1;
+                    break;
+                case KEY_UP:
+                    if (insert_field_data.current_selection > 0) {
+                        insert_field_data.current_selection--;
+                        stop_input = 1;
+                    }
+                    break;
+                case KEY_DOWN:
+                    // allow move down if not last course
+                    if ((insert_field_data.current_selection - 2 + 1) / insert_field_data.number_of_course_fields != number_of_courses) {  // current_course formula
+                        insert_field_data.current_selection++;
+                        stop_input = 1;
+                    }
+                    break;
+                case KEY_LEFT:
+                    if (n > 0) {
+                        wmove(insert_student_win, y, x - 1);
+                        n--;
+                    }
+                    break;
+                case KEY_RIGHT:
+                    if (n < strlen(buffer)) {
+                        wmove(insert_student_win, y, x + 1);
+                        n++;
+                    }
+                    break;
+                case KEY_BACKSPACE:
+                    if (n > 0) {
+                        wmove(insert_student_win, y, x - 1);
+                        waddch(insert_student_win, ' ');
+                        wmove(insert_student_win, y, x - 1);
+                        n--;
+                        buffer[n] = '\0';
+                    } else {
+                        wclrtoeol(insert_student_win);
+                    }
+                    break;
+                default:
+                    waddch(insert_student_win, buff_ch);
+                    buffer[n] = (char)buff_ch;
+                    n++;
+
+                    if (n >= ARRAY_SIZE(buffer) - 1) stop_input = 1;
+            }
+        } while(!stop_input);  // only breaks when key_up / down / enter key
+
+        if (buff_ch == KEY_UP || buff_ch == KEY_DOWN) {
+            auto_scroll();
+            continue;
+        }
+
+        buffer[n] = '\0';  // end
+
+        if (!validate_input(buffer)) {
+            move_to_inputting(insert_student_win);
+            wclrtoeol(insert_student_win);
+            continue;
+        }
+
+        char* dummy;
+        // store input
+        switch (insert_field_data.current_selection) {
+            case 0:  // id
+                if (student_id != NULL) {  // free memory if change
+                    free(student_id);
+                }
+                student_id = strdup(buffer);
                 break;
-
-            wprint_course_insert_field(stdscr, number_of_courses + 2);  // +1 to compensate the ++ later, and +1 to compensate for the initial run
+            case 1:  // name
+                if (student_name != NULL) {  // free memory if change
+                    free(student_name);
+                }
+                student_name = strdup(buffer);
+                break;
+            default:  // 2+, is courses
+                switch((insert_field_data.current_selection - 2) % 4) {
+                    case 0:  // course_code
+                        if (courses[current_course]->course_code != NULL) {  // free memory if change
+                            free(courses[current_course]->course_code);
+                        }
+                        courses[current_course]->course_code = strdup(buffer);
+                        break;
+                    case 1:  // sem
+                        courses[current_course]->sem = (int)strtol(buffer, &dummy, 10);
+                        break;
+                    case 2:  // cred hour
+                        courses[current_course]->credit_hours = (int)strtol(buffer, &dummy, 10);
+                        break;
+                    case 3:  // grade
+                        if (courses[current_course]->grade != NULL) {  // free memory if change
+                            free(courses[current_course]->grade);
+                        }
+                        courses[current_course]->grade = strdup(buffer);
+                        break;
+                    default:
+                        fprintf(stderr, "save_input: You shouldn't be here");
+                }
         }
 
-        number_of_courses++;
+        insert_field_data.current_selection++;
+        if (insert_field_data.current_selection > 2 &&   // not first course, auto printed already
+            (insert_field_data.current_selection - 2) % 4 == 0) {  // course info finish
+            // if something is not filled, move them to it.
+            if (courses[current_course]->course_code == NULL) {
+                insert_field_data.current_selection -= 4;
+                continue;
+            } else if (courses[current_course]->sem == 0) {
+                insert_field_data.current_selection -= 3;
+                continue;
+            } else if (courses[current_course]->credit_hours == 0) {
+                insert_field_data.current_selection -= 2;
+                continue;
+            } else if (courses[current_course]->grade == NULL) {
+                insert_field_data.current_selection -= 1;
+                continue;
+            }
 
-        // realloc thing
-        tmp = realloc(courses, number_of_courses*sizeof(Course*));
-        if (tmp == NULL) {
-            log_alloc_error("insert_student_name", "courses");
-            free(courses);
-            clear();
-            endwin();
-            return EXIT_FAILURE;
+            if (current_course == number_of_courses - 1) {  // last course
+                // prompt if want to add a new course
+                wmove(insert_student_win, (insertFieldCoords.courseCodeY - 1) + (insert_field_data.number_of_course_fields + 1 + 1) * (current_course + 1), 0);
+                wprintw_center(insert_student_win, COLS - 12, _("Do you want to add another course? "));
+                auto_scroll();
+                if (yes_or_no_selector(insert_student_win, 1)) {
+                    wprint_course_insert_field(insert_student_win, number_of_courses + 1);
+                    auto_scroll();
+                }
+                else
+                    exit = 1;
+            }
         }
-        courses = tmp;
-
-        // accept input from course fields
-        do {
-            move(insertFieldCoords.courseCodeY + (FIELD_HEIGHT + 1) * (number_of_courses - 1), insertFieldCoords.courseCodeX);
-            clrtoeol();
-            getnstr(course_code, ARRAY_SIZE(course_code));
-        } while(course_code[0] == '\0');
-        do {
-            move(insertFieldCoords.semY + (FIELD_HEIGHT + 1) * (number_of_courses - 1), insertFieldCoords.semX);
-            clrtoeol();
-            scanw("%d", &sem);
-        } while(sem <= 0);
-        do {
-            move(insertFieldCoords.creditHoursY + (FIELD_HEIGHT + 1) * (number_of_courses - 1), insertFieldCoords.creditHoursX);
-            clrtoeol();
-            scanw("%d", &credit_hours);
-        } while(credit_hours <= 0);
-        do {
-            move(insertFieldCoords.gradeY + (FIELD_HEIGHT + 1) * (number_of_courses - 1), insertFieldCoords.gradeX);
-            clrtoeol();
-            getnstr(grade, ARRAY_SIZE(grade));
-        } while (!is_valid_grade(grade));
-
-        // build course
-        Course* course = malloc(sizeof(Course));
-        if (course == NULL) {
-            log_alloc_error("insert_student_menu", "course");
-            return EXIT_FAILURE;
-        }
-        course->course_code = strdup(course_code);  // TODO: check allocation == NULL
-        course->sem = sem;
-        course->credit_hours = credit_hours;
-        course->grade = strdup(grade);
-
-        courses[number_of_courses - 1] = course;
-    } while (1);
+    } while (!exit);
 
     // ask to save or not
-    wprintw_center(stdscr, COLS - 8, _("Save record? "));
-    if (yes_or_no_selector(stdscr, 1)) {  // yes
+    wmove(insert_student_win, (insertFieldCoords.courseCodeY - 1) + (insert_field_data.number_of_course_fields + 1 + 1) * (number_of_courses ? number_of_courses : 1), 0);
+    wprintw_center(insert_student_win, COLS - 8, _("Save record? "));
+    if (yes_or_no_selector(insert_student_win, 1)) {  // yes
         student = (Student) {
                 student_id,
                 student_name,
@@ -290,12 +415,18 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
         store_student_courses(db, &student);
     }  // no, do nothing
 
-    for (int i = 0; i < number_of_courses; i++) {
-        free(courses[i]->course_code);
-        free(courses[i]->grade);
-        free(courses[i]);
+    if (courses != NULL) {
+        for (int i = 0; i < number_of_courses; i++) {
+            if (courses[i] != NULL) {
+                free(courses[i]->course_code);
+                free(courses[i]->grade);
+                free(courses[i]);
+            }
+        }
+        free(courses);
     }
-    free(courses);
+    free(student_name);
+    free(student_id);
 
     clear();
     endwin();
@@ -428,33 +559,33 @@ void wprint_initial_insert_student_menu(WINDOW* win, InsertFieldCoords* insertFi
 
     getyx(win, y, x);
     wprintw_center(win, COLS, _("Student Info"));
-    mvwchgat(win, y, 2, COLS-4, A_STANDOUT, 0, NULL);
-    wmove(win, y+1, 2);
+    mvwchgat(win, y, 0, -1, A_STANDOUT, 0, NULL);
+    wmove(win, y+1, 0);
     wprintw(win, _("%-15s: "), _("Student ID"));
     getyx(win, insertFieldCoords->studentIdY, insertFieldCoords->studentIdX);
     getyx(win, y, x);
-    wmove(win, y+1, 2);
+    wmove(win, y+1, 0);
     wprintw(win, _("%-15s: "), _("Student Name"));
     getyx(win, insertFieldCoords->studentNameY, insertFieldCoords->studentNameX);
     getyx(win, y, x);
 
     wmove(win, y+2, 0);
     wprintw_center(win, COLS, _("Course %d Info"), 1);
-    mvwchgat(win, y+2, 2, COLS-4, A_STANDOUT, 1, NULL);
+    mvwchgat(win, y+2, 0, COLS-4, A_STANDOUT, 1, NULL);
     getyx(win, y, x);
-    wmove(win, y+1, 2);
+    wmove(win, y+1, 0);
     wprintw(win, _("%-15s: "), _("Course code"));
     getyx(win, insertFieldCoords->courseCodeY, insertFieldCoords->courseCodeX);
     getyx(win, y, x);
-    wmove(win, y+1, 2);
+    wmove(win, y+1, 0);
     wprintw(win, _("%-15s: "), _("Semester"));
     getyx(win, insertFieldCoords->semY, insertFieldCoords->semX);
     getyx(win, y, x);
-    wmove(win, y+1, 2);
+    wmove(win, y+1, 0);
     wprintw(win, _("%-15s: "), _("Credit Hours"));
     getyx(win, insertFieldCoords->creditHoursY, insertFieldCoords->creditHoursX);
     getyx(win, y, x);
-    wmove(win, y+1, 2);
+    wmove(win, y+1, 0);
     wprintw(win, _("%-15s: "), _("Grade"));
     getyx(win, insertFieldCoords->gradeY, insertFieldCoords->gradeX);
 }
@@ -464,17 +595,17 @@ void wprint_course_insert_field(WINDOW* win, int n) {
 
     getyx(win, y, x);
     wprintw_center(win, COLS, _("Course %d Info"), n);
-    mvwchgat(win, y, 2, COLS-4, A_STANDOUT, n%N_COLOR + 1, NULL);
-    wmove(win, y+1, 2);
+    mvwchgat(win, y, 0, COLS-4, A_STANDOUT, n%N_COLOR + 1, NULL);
+    wmove(win, y+1, 0);
     wprintw(win, "%-15s: ", _("Course code"));
     getyx(win, y, x);
-    wmove(win, y+1, 2);
+    wmove(win, y+1, 0);
     wprintw(win, "%-15s: ", _("Semester"));
     getyx(win, y, x);
-    wmove(win, y+1, 2);
+    wmove(win, y+1, 0);
     wprintw(win, "%-15s: ", _("Credit Hours"));
     getyx(win, y, x);
-    wmove(win, y+1, 2);
+    wmove(win, y+1, 0);
     wprintw(win, "%-15s: ", _("Grade"));
 }
 
@@ -492,10 +623,7 @@ int yes_or_no_selector(WINDOW* win, int default_option) {
     wprintw(win, _("NO"));
     getyx(win, y, no_end_x);
 
-    noecho();
-    keypad(win, TRUE);
     curs_set(0);
-
     int input, selection = default_option;
     do {
         mvwchgat(win, y, yes_start_x, no_end_x - yes_start_x, 0, 0, NULL);
@@ -503,7 +631,7 @@ int yes_or_no_selector(WINDOW* win, int default_option) {
             mvwchgat(win, y, yes_start_x, yes_end_x - yes_start_x, A_STANDOUT, 0, NULL);
         else
             mvwchgat(win, y, no_start_x, no_end_x - no_start_x, A_STANDOUT, 0, NULL);
-        wrefresh(win);
+        prefresh(insert_student_win, insert_field_data.pad_current_row, 0, 2, 2, 2+insert_field_data.pad_height, 2+insert_field_data.pad_width);
 
         input = wgetch(win);
         switch (input) {
@@ -521,14 +649,89 @@ int yes_or_no_selector(WINDOW* win, int default_option) {
                 wclrtoeol(win);
 
                 // revert to before
-                echo();
-                keypad(win, FALSE);
                 curs_set(1);
                 return selection;
             default:
                 break;
         }
     } while (1);
+}
+
+void move_to_inputting(WINDOW* win) {
+    int y, x;
+    int current_course = (insert_field_data.current_selection - 2) / insert_field_data.number_of_course_fields;  // starts at 0
+
+    switch (insert_field_data.current_selection) {
+        case 0:  // id
+            y = insert_field_data.insertFieldCoords.studentIdY;
+            x = insert_field_data.insertFieldCoords.studentIdX;
+            break;
+        case 1:  // name
+            y = insert_field_data.insertFieldCoords.studentNameY;
+            x = insert_field_data.insertFieldCoords.studentNameX;
+            break;
+        default:  // 2+, is courses
+            switch((insert_field_data.current_selection - 2) % 4) {
+                case 0:  // course_code
+                    y = insert_field_data.insertFieldCoords.courseCodeY + (insert_field_data.number_of_course_fields + 2) * current_course;
+                    x = insert_field_data.insertFieldCoords.courseCodeX;
+                    break;
+                case 1:  // sem
+                    y = insert_field_data.insertFieldCoords.semY + (insert_field_data.number_of_course_fields + 2) * current_course;
+                    x = insert_field_data.insertFieldCoords.semX;
+                    break;
+                case 2:  // cred hour
+                    y = insert_field_data.insertFieldCoords.creditHoursY + (insert_field_data.number_of_course_fields + 2) * current_course;
+                    x = insert_field_data.insertFieldCoords.creditHoursX;
+                    break;
+                case 3:  // grade
+                    y = insert_field_data.insertFieldCoords.gradeY + (insert_field_data.number_of_course_fields + 2) * current_course;
+                    x = insert_field_data.insertFieldCoords.gradeX;
+                    break;
+                default:
+                    fprintf(stderr, "move_to_inputting: You shouldn't be here");
+            }
+    }
+    wmove(win, y, x);
+}
+
+int validate_input(char * input) {
+    long integer_input;
+    char *buff;
+
+    switch (insert_field_data.current_selection) {
+        case 0:  // id
+        case 1:  // name
+            if (input[0] == '\0') return 0;
+            else return 1;
+        default:  // 2+, is courses
+            switch((insert_field_data.current_selection - 2) % 4) {
+                case 0:  // course_code
+                    if (input[0] == '\0') return 0;
+                    else return 1;
+                case 1:  // sem
+                case 2:  // cred hour
+                    integer_input = strtol(input, &buff, 10);
+                    if (integer_input <= 0) return 0;
+                    return 1;
+                case 3:  // grade
+                    if (!is_valid_grade(input)) return 0;
+                    return 1;
+                default:
+                    fprintf(stderr, "validate_input: You shouldn't be here");
+                    return 0;
+            }
+    }
+}
+
+void auto_scroll() {
+    int y, x;
+    getyx(insert_student_win, y, x);
+    if (y > insert_field_data.pad_current_row + insert_field_data.pad_height)
+        insert_field_data.pad_current_row = y - insert_field_data.pad_height;
+    else if (y <= insert_field_data.pad_current_row) {
+        insert_field_data.pad_current_row = y - 1;
+    }
 }
 
 /* Helpers */
@@ -592,7 +795,7 @@ static inline void wprintw_footer(WINDOW* win, bool standout) {
     int crow, ccol;
     getmaxyx(win, crow, ccol);
 
-    wprintw(win, "[q] %s\t[Enter] %s\t", _("Quit"), _("View Details"));
+    wprintw(win, "[q] %s\t", _("Quit"));
     waddch(win, '[');
     waddch(win, ACS_LARROW);
     waddch(win, ACS_RARROW);
@@ -603,6 +806,7 @@ static inline void wprintw_footer(WINDOW* win, bool standout) {
     waddch(win, ACS_DARROW);
     waddch(win, ']');
     wprintw(win, " %s\t", _("Scroll"));
+    wprintw(win, "[Enter] %s\t[d] %s\t", _("View Details"), _("Delete"));
     if (standout)
         wstandout_line(win, crow, 0);  // other color pair don't work for some reason, make line invisible until terminal resized.
 }
