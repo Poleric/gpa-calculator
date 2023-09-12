@@ -59,7 +59,7 @@ int main() {
     do {
         clear_screen();
         printf("=======================================\n");
-        printf("          %s          \n", _("GPA/CGPA CALCULATOR"));
+        printf("          %s          \n", _("GPA/CGPA CALCULATOR"));  // 10 padded left right, 39 wide field
         printf("=======================================\n");
         printf(_("ADMIN ENTER 1\n"));
         printf(_("STUDENT ENTER 2\n"));
@@ -137,7 +137,7 @@ void admin(){
 	struct tm tm = *localtime(&t);
 
 	printf("=======================================\n");
-	printf("==        %s        ==\n", _("GPA/CGPA CALCULATOR"));
+	printf("==        %s        ==\n", _("GPA/CGPA CALCULATOR")); // 10 padded left right, 39 wide field.
 	printf("=======================================\n");
 	printf(_("ADMINISTRATOR\n"));
 	printf(_("SCHOOL: KOLEJ PASAR\n"));
@@ -153,7 +153,8 @@ void admin(){
     int option, exit = 0;
     do {
         clear_screen();
-        printf("     %s\n", _("WELCOME TO THE ADMIN SCREEN"));
+        printf("=======================================\n");
+        printf("     %s\n", _("WELCOME TO THE ADMIN SCREEN"));  // 5 space padded left, 39 wide field
         printf("=======================================\n");
         printf(_("VIEW student list ENTER 1\n"));
         printf(_("GET a student details ENTER 2\n"));
