@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: none\n"
 "Language: ms\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ASCII\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:56
@@ -25,7 +25,7 @@ msgstr "Gagal untuk menukar bahasa"
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:140
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:225
 msgid "GPA/CGPA CALCULATOR"
-msgstr "GPA/CGPA kalkulator"
+msgstr "GPA/CGPA Kalkulator"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:64
 #, c-format
@@ -46,12 +46,12 @@ msgstr "KELUAR MASUKKAN %d\n"
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:68
 #, c-format
 msgid "ENTER AS ADMIN/STUDENT : "
-msgstr "MASUKKAN SEBAGAI ADMIN/PELAJAR"
+msgstr "MASUKKAN SEBAGAI ADMIN/PELAJAR: "
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:86
 #, c-format
 msgid "PLEASE CHOOSE THE NUMBER AGAIN: "
-msgstr "SILA PILIH NOMBOR SEKALI LAGI"
+msgstr "SILA PILIH NOMBOR SEKALI LAGI: "
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:102
 #, c-format
@@ -61,23 +61,23 @@ msgstr "Bahasa\n"
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:110
 #, c-format
 msgid "Enter a number > "
-msgstr "Masukkan nombor"
+msgstr "Masukkan nombor > "
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:115
 #, c-format
 msgid "%d is not a valid option. Please input again.\n"
-msgstr "\d bukan pilihan yang sah. Sila masukkan sekali lagi"
+msgstr "%d bukan pilihan yang sah. Sila masukkan sekali lagi.\n"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:142
 #, c-format
 msgid "ADMINISTRATOR\n"
-msgstr "PENTADBIR"
+msgstr "PENTADBIR\n"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:143
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:228
 #, c-format
 msgid "SCHOOL: KOLEJ PASAR\n"
-msgstr "SEKOLAH: KOLEJ PASAR"
+msgstr "SEKOLAH: KOLEJ PASAR\n"
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:144
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:229
@@ -112,7 +112,7 @@ msgstr "MEMADAM pelajar MASUKKAN 4\n"
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:164
 #, c-format
 msgid "ENTER: "
-msgstr "MASUKKAN"
+msgstr "MASUKKAN: "
 
 #: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:198
 #, c-format
