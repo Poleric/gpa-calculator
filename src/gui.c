@@ -301,8 +301,12 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
                 case KEY_DOWN:
                     // allow move down if not last course
                     if ((insert_field_data.current_selection - 2 + 1) / insert_field_data.number_of_course_fields != number_of_courses) {  // current_course formula
-                        insert_field_data.current_selection++;
                         stop_input = 1;
+
+                        if (n > 0)  // logic same as enter key
+                            wclrtoeol(insert_student_win);
+                        else
+                            insert_field_data.current_selection++;;
                     }
                     break;
                 case KEY_LEFT:
@@ -337,9 +341,12 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
             }
         } while(!stop_input);  // only breaks when key_up / down / enter key
 
-        if (buff_ch == KEY_UP || buff_ch == KEY_DOWN) {
+        if (buff_ch == KEY_UP) {
             auto_scroll();
             continue;
+        } if (buff_ch == KEY_DOWN) {
+            if (n > 0); // same as enter key, let it continue get stored
+            else continue;  // dont store
         }
 
         buffer[n] = '\0';  // end
