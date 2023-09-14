@@ -28,18 +28,6 @@ void pause() {
     getchar();
 }
 
-int is_char_in(char character, const char* string, size_t arr_len) {
-	/* Returns 0 if character is in the array, returns -1 if otherwise.
-	Based on python `in` keyword
-	*/
-
-	for (int i = 0; i < arr_len; i++) {
-		if (character == string[i])
-			return 0;
-	}
-	return -1;
-}
-
 int is_valid_grade(char* grade) {
     if (strcmp(grade, "A") == 0)
         return 1;
@@ -96,16 +84,3 @@ int filter_sem_courses(int sem, Course** pCourses, size_t courses_len, Course** 
     }
     return 0;
 }
-
-Course* get_course_with_id(char* course_code, Course** pCourse, size_t course_len) {
-    /* Get the Course pointer given a course_code from an array of Courses. Returns NULL if not found. */
-
-    for (int i = 0; i < course_len; i++) {
-        if (strcmp(pCourse[i]->course_code, course_code) == 0) {
-            return pCourse[i];
-        }
-    }
-    return NULL;
-}
-
-
