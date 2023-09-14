@@ -62,6 +62,7 @@ int get_gpas_from_courses(Course** pCourses, int number_of_courses, float* buff,
 
     free(total_quality_points);
     free(total_credit_hours);
+    return EXIT_SUCCESS;
 }
 
 float get_cgpa_from_courses(Course** pCourses, int number_of_courses) {
@@ -86,4 +87,11 @@ int get_student_gpas(Student* pStudent, float* buff, int buff_len) {
 
 float get_student_cgpa(Student* pStudent) {
     return get_cgpa_from_courses(pStudent->pCourses, pStudent->number_of_courses);
+}
+
+int get_total_credit_hours(Course** pCourses, int number_of_courses) {
+    int total_credit_hours = 0;
+    for (int i = 0; i < number_of_courses; i++)
+        total_credit_hours += pCourses[i]->credit_hours;
+    return total_credit_hours;
 }
