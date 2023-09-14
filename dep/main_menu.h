@@ -9,7 +9,7 @@ void admin();
 int adminLogin();
 void student();
 
-char* promptLanguage();
+const char* promptLanguage();
 char* setLocale(const char* lang_code);
 void getStudentDetailsScreen();
 SQLStudent* promptStudentID();

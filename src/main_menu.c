@@ -46,15 +46,17 @@ int setenv(const char* name, const char* value, int overwrite)
 #define SUPPORTED_LANGUAGES_TEXT {"English (United Kingdom)", "English (United State)", "简体中文", "Bahasa Melayu"}
 #define SUPPORTED_LANGUAGES_CODES {ENGLISH_UK, ENGLISH_US, CHINESE_CN, MALAY_MY}
 
+#define ADMIN_PASSWORD "123456789abc"
 #define EXIT_FLAG (-1)
+#define MINIMUM_CREDIT_HOURS 21
 sqlite3* db;
 
 int main() {
     // initialize locales
-	int id, exit = 0;
-    char* locale;
+    int option, exit = 0;
 
     #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
+    // force utf-8 on windows console
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
     #endif
@@ -63,9 +65,14 @@ int main() {
     init_student_db(db);
 
     clear_screen();
-    locale = promptLanguage();
-    locale = setLocale(locale);
-    if (locale == NULL) {
+
+    // set system default locale
+    setlocale(LC_ALL, "");
+    bindtextdomain("gpa-calculator", LOCALE_DIR);
+    textdomain("gpa-calculator");
+
+    const char* locale = promptLanguage();
+    if (setLocale(locale) == NULL) {
         fprintf(stderr, _("Failed to set language. Does your system does not support this language?"));
         putchar('\n');
         pause();
@@ -82,10 +89,10 @@ int main() {
         printf(_("EXIT ENTER %d\n"), EXIT_FLAG);
         printf(_("ENTER AS ADMIN/STUDENT : "));
         do {
-            scanf("%d", &id);
+            scanf("%d", &option);
             flush_stdin();
 
-            switch (id) {
+            switch (option) {
                 case EXIT_FLAG:
                     exit = 1;
                     break;
@@ -99,18 +106,18 @@ int main() {
                     break;
                 default:
                     printf(_("PLEASE CHOOSE THE NUMBER AGAIN: "));
-                    id = 0;
+                    option = 0;
             }
-        } while (!id);  // id != 0
+        } while (!option);  // option != 0
         clear_screen();
     } while(!exit);
 	sqlite3_close(db);  //close database
 }
 
-char* promptLanguage() {
+const char* promptLanguage() {
     /* Returns the corresponding locale code the user selected */
-    char* supported_langs[] = SUPPORTED_LANGUAGES_TEXT;
-    char* supported_langs_code[] = SUPPORTED_LANGUAGES_CODES;
+    const char* supported_langs[] = SUPPORTED_LANGUAGES_TEXT;
+    const char* supported_langs_code[] = SUPPORTED_LANGUAGES_CODES;
     int input_num;
 
     printf("======================================\n");
@@ -225,7 +232,7 @@ int adminLogin() {
         fgets(input, ARRAY_SIZE(input), stdin);  // gets is removed from C11
         input[strcspn(input, "\n")] = '\0';  // remove trailing newline from fgets
 
-        if(strcmp(input,"123456789abc") == 0) {
+        if(strcmp(input, ADMIN_PASSWORD) == 0) {
             return EXIT_SUCCESS;
         } else if (tries > 0) {
             printf(_("PASSWORD INCORRECT\n"));
@@ -350,6 +357,12 @@ void printFullStudentDetails(SQLStudent* student) {
     printf(_("Total enrolled courses: %d\n"), student->number_of_courses);
 
     printStudentCoursesTable(student);
+
+    putchar('\n');
+    if (get_total_credit_hours((Course**)student->pSQLCourses, student->number_of_courses) >= MINIMUM_CREDIT_HOURS)
+        printf(_("%s is eligible to graduate."), student->name);
+    else
+        printf(_("%s is not eligible to graduate."), student->name);
 }
 
 void printManyChar(char character, int length) {
@@ -374,7 +387,7 @@ void printLineWithManyCharWithSeperators(char character, int length, char sepera
 }
 
 void printStudentCoursesTable(SQLStudent* student) {
-    const int COLUMN_WIDTH = 15;
+    const int COLUMN_WIDTH = 18;
     int max_sem = get_max_sem(db);
 
     printLineWithManyChar('=', (COLUMN_WIDTH+1)*max_sem);
@@ -413,7 +426,8 @@ void printStudentCoursesTable(SQLStudent* student) {
                 stop = 0;
                 printf(" %s", course->course_code);
                 printf(" > ");
-                printf("%-*s", COLUMN_WIDTH - 5 - (int)strlen(course->course_code), course->grade);
+                printf("%-*s", COLUMN_WIDTH - 8 - (int)strlen(course->course_code), course->grade);
+                printf(" %-2d", course->credit_hours);
                 printf(" |");
             } else {
                 printManyChar(' ', COLUMN_WIDTH);
@@ -433,12 +447,12 @@ void printStudentCoursesTable(SQLStudent* student) {
     printLineWithManyCharWithSeperators('-', COLUMN_WIDTH, '|', max_sem, TRUE);
 
     for (int sem = 1; sem <= max_sem; sem++) {
-        printf("  ");
+        printf("    ");
         float gpa = get_gpa_from_courses((Course**)student->pSQLCourses, student->number_of_courses, sem);
         if (!isnan(gpa))  // can be printed
-            printf(_("GPA: %-*.2f"), COLUMN_WIDTH - 7, gpa);
+            printf(_("GPA: %-*.2f"), COLUMN_WIDTH - 9, gpa);
         else  // no course within that sem
-            printf(_("GPA: %-*s"), COLUMN_WIDTH-7, "-");
+            printf(_("GPA: %-*s"), COLUMN_WIDTH-9, "-");
         printf("|");
     }
     putchar('\n');
