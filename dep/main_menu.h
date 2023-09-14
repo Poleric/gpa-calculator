@@ -10,7 +10,7 @@ int adminLogin();
 void student();
 
 char* promptLanguage();
-char* setLocale(char* lang_code);
+char* setLocale(const char* lang_code);
 void getStudentDetailsScreen();
 SQLStudent* promptStudentID();
 void promptDeletion();

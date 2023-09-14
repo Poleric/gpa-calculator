@@ -1,23 +1,24 @@
+#include <time.h>  // time_t, time(), localtime()
+#include <string.h>  // strlen(), strcpy(), strcat()
+#include <math.h>  // isnan()
 #include <gui.h>
-#include <time.h>
-#include <string.h>
 #include <calculation.h>
 #include <utils.h>
 #include <main_menu.h>
-
-#include <locale.h>
-#include <libintl.h>
+#include <locale.h>  // setlocale(), bindtextdomain(), textdomain()
+#include <libintl.h>  // gettext()
 #define _(String) gettext(String)
 #define ARRAY_SIZE(x) sizeof(x)/sizeof(x[0])
 
-#ifdef LOCALE_DIR
+#ifdef LOCALE_DIR  // defined in CMake, else default to linux default
 #else
 #define LOCALE_DIR "/usr/local/share/locale"
 #endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
+// windows does not have setenv, need manual definition
+
 #include <Windows.h>
-// windows no setenv
 int setenv(const char* name, const char* value, int overwrite)
 {
     int errcode = 0;
@@ -29,8 +30,6 @@ int setenv(const char* name, const char* value, int overwrite)
     return _putenv_s(name, value);
 }
 #endif
-
-#define EXIT_FLAG (-1)
 
 // language defines
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
@@ -47,6 +46,7 @@ int setenv(const char* name, const char* value, int overwrite)
 #define SUPPORTED_LANGUAGES_TEXT {"English (United Kingdom)", "English (United State)", "简体中文", "Bahasa Melayu"}
 #define SUPPORTED_LANGUAGES_CODES {ENGLISH_UK, ENGLISH_US, CHINESE_CN, MALAY_MY}
 
+#define EXIT_FLAG (-1)
 sqlite3* db;
 
 int main() {
@@ -135,19 +135,20 @@ char* promptLanguage() {
     return supported_langs_code[input_num - 1];
 }
 
-char* setLocale(char* lang_code) {
+char* setLocale(const char* lang_code) {
     char* set_locale;
 
     setenv("LANG", lang_code, 1);
     setenv("LANGUAGE", lang_code, 1);
     set_locale = setlocale(LC_ALL, "");
     if (set_locale == NULL) {  // add .UTF-8 if fail
-        char lang_utf[ARRAY_SIZE(lang_code) + 6];
+        char* lang_utf = malloc(strlen(lang_code) + 1 + 6);
 
         strcpy(lang_utf, lang_code);
         strcat(lang_utf, ".UTF-8");
 
         set_locale = setlocale(LC_ALL, lang_utf);
+        free(lang_utf);
     }
     bindtextdomain("gpa-calculator", LOCALE_DIR);
     textdomain("gpa-calculator");
@@ -433,7 +434,11 @@ void printStudentCoursesTable(SQLStudent* student) {
 
     for (int sem = 1; sem <= max_sem; sem++) {
         printf("  ");
-        printf(_("GPA: %-*.2f"), COLUMN_WIDTH - 7, get_gpa_from_courses((Course**)student->pSQLCourses, student->number_of_courses, sem));
+        float gpa = get_gpa_from_courses((Course**)student->pSQLCourses, student->number_of_courses, sem);
+        if (!isnan(gpa))  // can be printed
+            printf(_("GPA: %-*.2f"), COLUMN_WIDTH - 7, gpa);
+        else  // no course within that sem
+            printf(_("GPA: %-*s"), COLUMN_WIDTH-7, "-");
         printf("|");
     }
     putchar('\n');
@@ -441,7 +446,11 @@ void printStudentCoursesTable(SQLStudent* student) {
     printLineWithManyChar('=', (COLUMN_WIDTH+1)*max_sem);
 
     printf(" ");
-    printf(_("CGPA: %-*.2f"), COLUMN_WIDTH*max_sem + max_sem - 8, get_cgpa_from_courses((Course**)student->pSQLCourses, student->number_of_courses));
+    float cgpa = get_cgpa_from_courses((Course**)student->pSQLCourses, student->number_of_courses);
+    if (!isnan(cgpa))  // can be printed
+        printf(_("CGPA: %-*.2f"), COLUMN_WIDTH*max_sem + max_sem - 8, cgpa);
+    else  // no course within that sem
+        printf(_("GPA: %-*s"), COLUMN_WIDTH*max_sem + max_sem - 8, "-");
     printf("|\n");
 
     printLineWithManyChar('=', (COLUMN_WIDTH+1)*max_sem);

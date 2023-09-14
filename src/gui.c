@@ -1,14 +1,12 @@
-#include <stdlib.h>
+#include <string.h>  // strdup(), strlen(), strcpy(), strcat()
+#include <math.h>  // isnan()
+#include <stdarg.h>  // va_list, va_start()
 #include <db.h>
-#include <string.h>
 #include <calculation.h>
 #include <utils.h>
-#include <stdarg.h>
 #include <main_menu.h>
 #include <gui.h>
-
-#include <locale.h>
-#include <libintl.h>
+#include <libintl.h>  // gettext()
 
 #define _(String) gettext(String)
 
@@ -35,10 +33,10 @@
 // used by student_list_menu
 WINDOW* student_list_win;
 WINDOW* insert_student_win;
-FieldData field_data;
+FieldData student_list_field_data;
 InsertFieldData insert_field_data;
 
-int sort_gpa_sem;  // workaround for compare_gpa by semester.
+int sort_gpa_sem;  // workaround for cfield_dataompare_gpa by semester.
 const int N_COLOR = 3;
 
 void init_color_pairs() {
@@ -47,6 +45,8 @@ void init_color_pairs() {
      * 2 - Cyan background
      * 3 - Yellow background
      */
+    use_default_colors();
+    assume_default_colors(-1, -1);
     init_pair(1, COLOR_GREEN, COLOR_BLACK);
     init_pair(2, COLOR_CYAN, COLOR_BLACK);
     init_pair(3, COLOR_YELLOW, COLOR_BLACK);
@@ -69,9 +69,9 @@ int student_list_menu(sqlite3* db) {
     int max_sem = get_max_sem(db);
 
     init_field_data(COLS, LINES-3, max_sem);
-    if (field_data.width > COLS) {
+    if (student_list_field_data.width > COLS) {
         endwin();
-        fprintf(stderr, _("Screen is too small, resize to be atleast %d wide.\n"), field_data.width);
+        fprintf(stderr, _("Screen is too small, resize to be atleast %d wide.\n"), student_list_field_data.width);
         return EXIT_FAILURE;
     }
 
@@ -83,15 +83,15 @@ int student_list_menu(sqlite3* db) {
     wprintw_footer(stdscr, TRUE);
     refresh();
 
-    field_data.rows = calloc(max_students, sizeof(RowData));
-    field_data.number_of_rows = max_students;
+    student_list_field_data.rows = calloc(max_students, sizeof(RowData));
+    student_list_field_data.number_of_rows = max_students;
     init_rows(db);
 
     int current_row = 0, selection = 0, update = 1;
     int input;
     int sort_mode = 1; // 1 - id, 2 - name, 3+ - gpa, ..., cgpa
 
-    student_list_win = newwin(field_data.height, field_data.width, 2, 0);
+    student_list_win = newwin(student_list_field_data.height, student_list_field_data.width, 2, 0);
     keypad(student_list_win, TRUE);
     leaveok(student_list_win, TRUE);
     curs_set(0);
@@ -103,7 +103,7 @@ int student_list_menu(sqlite3* db) {
 
             update_student_list_window(current_row);
 
-            int selected_row = current_row < max_students - field_data.height ? 0 : selection - current_row;
+            int selected_row = current_row < max_students - student_list_field_data.height ? 0 : selection - current_row;
             wstandout_line(student_list_win, selected_row, 2);
             wrefresh(student_list_win);
 
@@ -116,7 +116,7 @@ int student_list_menu(sqlite3* db) {
         switch(input) {
             // scroll up and down
             case KEY_UP:
-                if (current_row > 0 && selection < max_students - field_data.height + 1) {  // magic numbers
+                if (current_row > 0 && selection < max_students - student_list_field_data.height + 1) {  // magic numbers
                     current_row--;
                     update = 1;
                 }
@@ -126,7 +126,7 @@ int student_list_menu(sqlite3* db) {
                 }
                 break;
             case KEY_DOWN:
-                if (current_row < max_students - field_data.height) {
+                if (current_row < max_students - student_list_field_data.height) {
                     current_row++;
                     update = 1;
                 }
@@ -144,7 +144,7 @@ int student_list_menu(sqlite3* db) {
                 }
                 break;
             case KEY_RIGHT:
-                if (sort_mode < 3 + field_data.semCols) {
+                if (sort_mode < 3 + student_list_field_data.semCols) {
                     sort_mode++;
                     sort_row(sort_mode);
                     update = 1;
@@ -157,10 +157,10 @@ int student_list_menu(sqlite3* db) {
                 endwin();
 
                 clear_screen();
-                stud = get_student(db, field_data.rows[selection].studentID);
+                stud = get_student(db, student_list_field_data.rows[selection].studentID);
                 printFullStudentDetails(stud);
                 free_student(stud);
-                getchar();
+                pause();
 
                 reset_prog_mode();
                 refresh();
@@ -170,15 +170,15 @@ int student_list_menu(sqlite3* db) {
                 endwin();
 
                 clear_screen();
-                stud = get_student(db, field_data.rows[selection].studentID);
+                stud = get_student(db, student_list_field_data.rows[selection].studentID);
                 deleteStudent(stud);
                 free_student(stud);
 
                 free_rows();
 
                 max_students = get_number_of_students(db);
-                field_data.rows = calloc(max_students, sizeof(RowData));
-                field_data.number_of_rows = max_students;
+                student_list_field_data.rows = calloc(max_students, sizeof(RowData));
+                student_list_field_data.number_of_rows = max_students;
                 init_rows(db);
 
                 update = 1;
@@ -240,9 +240,9 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
     int exit = 0, number_of_courses = 0;
     int y, x;
     keypad(insert_student_win, TRUE);
-    do {
+    do {  // all inputs loop
         int current_course = (insert_field_data.current_selection - 2) / insert_field_data.number_of_course_fields;  // starts at 0
-        
+
         if (current_course == number_of_courses) {  // if no course, make new
             Course **tmp = realloc(courses, (number_of_courses + 1) * sizeof(Course *));
             if (tmp == NULL) {
@@ -274,7 +274,7 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
         n = 0;
         move_to_inputting(insert_student_win);
         int stop_input = 0;
-        do {
+        do {  // field input loop
             getyx(insert_student_win, y, x);
             prefresh(insert_student_win, insert_field_data.pad_current_row, 0, 2, 2, 2+insert_field_data.pad_height, 2+insert_field_data.pad_width);
             buff_ch = wgetch(insert_student_win);
@@ -292,8 +292,12 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
                     break;
                 case KEY_UP:
                     if (insert_field_data.current_selection > 0) {
-                        insert_field_data.current_selection--;
                         stop_input = 1;
+
+                        if (n > 0)  // save if theres content
+                            wclrtoeol(insert_student_win);
+                        else
+                            insert_field_data.current_selection--;
                     }
                     break;
                 case KEY_DOWN:
@@ -301,7 +305,7 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
                     if ((insert_field_data.current_selection - 2 + 1) / insert_field_data.number_of_course_fields != number_of_courses) {  // current_course formula
                         stop_input = 1;
 
-                        if (n > 0)  // logic same as enter key
+                        if (n > 0)  // save if theres content
                             wclrtoeol(insert_student_win);
                         else
                             insert_field_data.current_selection++;;
@@ -339,12 +343,10 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
             }
         } while(!stop_input);  // only breaks when key_up / down / enter key
 
-        if (buff_ch == KEY_UP) {
+        if (buff_ch == KEY_UP || buff_ch == KEY_DOWN) {
             auto_scroll();
-            continue;
-        } if (buff_ch == KEY_DOWN) {
-            if (n > 0); // same as enter key, let it continue get stored
-            else continue;  // dont store
+            if (n > 0);  // dont break if got content
+            else continue;
         }
 
         buffer[n] = '\0';  // end
@@ -395,7 +397,10 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
                 }
         }
 
-        insert_field_data.current_selection++;
+        if (buff_ch != KEY_UP)  // go down if not up arrow
+            insert_field_data.current_selection++;
+        else  // is up arrow input, go up.
+            insert_field_data.current_selection--;
         if (insert_field_data.current_selection > 2 &&   // not first course, auto printed already
             (insert_field_data.current_selection - 2) % 4 == 0) {  // course info finish
             // if something is not filled, move them to it.
@@ -423,10 +428,10 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
                     auto_scroll();
                 }
                 else
-                    exit = 1;
+                    exit = 1;  // done with inputs
             }
         }
-    } while (!exit);
+    } while (!exit);  // only exits when select no for add another course OR ctrl-c.
 
     // ask to save or not
     wmove(insert_student_win, (insertFieldCoords.courseCodeY - 1) + (insert_field_data.number_of_course_fields + 1 + 1) * (number_of_courses ? number_of_courses : 1), 0);
@@ -465,35 +470,41 @@ int write_student_list_window(int current_row) {
     RowData row;
     for (
         int i = current_row;
-        i < field_data.number_of_rows && i < current_row + field_data.height;
+        i < student_list_field_data.number_of_rows && i < current_row + student_list_field_data.height;
         i++, wmove(student_list_win, crow+1, 0)
     )
     {
-        row = field_data.rows[i];
+        row = student_list_field_data.rows[i];
 
         // print student_id
         getyx(student_list_win, crow, ccol);
         wprintw(student_list_win, "%s", row.studentID);
-        wmove(student_list_win, crow, ccol + field_data.idFieldLen + field_data.fieldSeperateLen);
+        wmove(student_list_win, crow, ccol + student_list_field_data.idFieldLen + student_list_field_data.fieldSeperateLen);
 
         // print student_name
         getyx(student_list_win, crow, ccol);
         char* name = row.studentName;
-        if (strlen(name) > field_data.nameFieldLen) {
-            truncate_str(name, field_data.nameFieldLen);
+        if (strlen(name) > student_list_field_data.nameFieldLen) {
+            truncate_str(name, student_list_field_data.nameFieldLen);
         }
         wprintw(student_list_win, "%s", name);
-        wmove(student_list_win, crow, ccol + field_data.nameFieldLen + field_data.fieldSeperateLen);
+        wmove(student_list_win, crow, ccol + student_list_field_data.nameFieldLen + student_list_field_data.fieldSeperateLen);
 
         // print gpas
-        for (int j = 0; j < field_data.semCols; j++) {
+        for (int j = 0; j < student_list_field_data.semCols; j++) {
             getyx(student_list_win, crow, ccol);
-            wprintw_center(student_list_win, field_data.gpaFieldLen, "%.2f", row.gpas[j]);
-            wmove(student_list_win, crow, ccol + field_data.gpaFieldLen + field_data.fieldSeperateLen);
+            if (!isnan(row.gpas[j])) // is a number, can print
+                wprintw_center(student_list_win, student_list_field_data.gpaFieldLen, "%.2f", row.gpas[j]);
+            else  // not a number
+                wprintw_center(student_list_win, student_list_field_data.gpaFieldLen, "-");
+            wmove(student_list_win, crow, ccol + student_list_field_data.gpaFieldLen + student_list_field_data.fieldSeperateLen);
         }
 
         // print cgpa
-        wprintw_center(student_list_win, field_data.cgpaFieldLen, "%.2f", row.cgpa);
+        if (!isnan(row.cgpa))
+            wprintw_center(student_list_win, student_list_field_data.cgpaFieldLen, "%.2f", row.cgpa);
+        else
+            wprintw_center(student_list_win, student_list_field_data.cgpaFieldLen, "-");
     }
     wmove(student_list_win, 0, 0);
     return EXIT_SUCCESS;
@@ -506,20 +517,20 @@ void update_student_list_window(int current_row) {
 
 void init_field_data(int max_width, int max_height, int max_sem) {
     // field lengths
-    field_data.fieldSeperateLen = FIELD_SEPERATE_LEN; field_data.idFieldLen = ID_FIELD_LEN; field_data.gpaFieldLen = GPA_FIELD_LEN; field_data.cgpaFieldLen = CGPA_FIELD_LEN;
-    field_data.nameFieldLen = max_width - ID_FIELD_LEN - max_sem*(GPA_FIELD_LEN + FIELD_SEPERATE_LEN) - CGPA_FIELD_LEN - 2*FIELD_SEPERATE_LEN;
+    student_list_field_data.fieldSeperateLen = FIELD_SEPERATE_LEN; student_list_field_data.idFieldLen = ID_FIELD_LEN; student_list_field_data.gpaFieldLen = GPA_FIELD_LEN; student_list_field_data.cgpaFieldLen = CGPA_FIELD_LEN;
+    student_list_field_data.nameFieldLen = max_width - ID_FIELD_LEN - max_sem * (GPA_FIELD_LEN + FIELD_SEPERATE_LEN) - CGPA_FIELD_LEN - 2 * FIELD_SEPERATE_LEN;
 
-    if (field_data.nameFieldLen < MINIMUM_NAME_FIELD_LEN) {
-        field_data.width = max_width + MINIMUM_NAME_FIELD_LEN - field_data.nameFieldLen;  // math magic
-        field_data.nameFieldLen = MINIMUM_NAME_FIELD_LEN;
+    if (student_list_field_data.nameFieldLen < MINIMUM_NAME_FIELD_LEN) {
+        student_list_field_data.width = max_width + MINIMUM_NAME_FIELD_LEN - student_list_field_data.nameFieldLen;  // math magic
+        student_list_field_data.nameFieldLen = MINIMUM_NAME_FIELD_LEN;
     } else
-        field_data.width = max_width;
+        student_list_field_data.width = max_width;
     
     // field strings
-    field_data.idFieldString = ID_FIELD_STRING; field_data.nameFieldString = NAME_FIELD_STRING; field_data.gpaFieldString = GPA_FIELD_STRING; field_data.cgpaFieldString = CGPA_FIELD_STRING;
+    student_list_field_data.idFieldString = ID_FIELD_STRING; student_list_field_data.nameFieldString = NAME_FIELD_STRING; student_list_field_data.gpaFieldString = GPA_FIELD_STRING; student_list_field_data.cgpaFieldString = CGPA_FIELD_STRING;
 
-    field_data.height = max_height;
-    field_data.semCols = max_sem;
+    student_list_field_data.height = max_height;
+    student_list_field_data.semCols = max_sem;
 }
 
 int init_rows(sqlite3* db) {
@@ -528,7 +539,7 @@ int init_rows(sqlite3* db) {
 
     for (
         int i = 0, ret = sqlite3_step(stmt);
-        i < field_data.number_of_rows && ret == SQLITE_ROW;
+        i < student_list_field_data.number_of_rows && ret == SQLITE_ROW;
         i++, ret = sqlite3_step(stmt)
     )
     {
@@ -549,7 +560,7 @@ int init_rows(sqlite3* db) {
         SQLCourse** pSQLCourses = malloc( number_of_courses * sizeof(SQLCourse*));
         get_student_courses(db, (char*) stud_id, pSQLCourses, number_of_courses);
 
-        float* gpas = calloc(field_data.semCols, sizeof(float));
+        float* gpas = calloc(student_list_field_data.semCols, sizeof(float));
 
         if (gpas == NULL) {
             log_alloc_error("init_rows", "gpas");
@@ -558,7 +569,7 @@ int init_rows(sqlite3* db) {
             return EXIT_FAILURE;
         }
 
-        get_gpas_from_courses((Course**)pSQLCourses, number_of_courses, gpas, field_data.semCols);
+        get_gpas_from_courses((Course**)pSQLCourses, number_of_courses, gpas, student_list_field_data.semCols);
 
         float cgpa = get_cgpa_from_courses((Course**)pSQLCourses, number_of_courses);
 
@@ -574,7 +585,7 @@ int init_rows(sqlite3* db) {
         pRow->gpas = gpas;
         pRow->cgpa = cgpa;
 
-        field_data.rows[i] = *pRow;
+        student_list_field_data.rows[i] = *pRow;
         free(pRow);
     }
     sqlite3_finalize(stmt);
@@ -767,14 +778,14 @@ void auto_scroll() {
 static inline int sort_row(int sort_mode) {
     // 1 - id, 2 - name, 3+ - gpa, ..., cgpa
     if (sort_mode == 1)
-        qsort(field_data.rows, field_data.number_of_rows, sizeof(RowData), compare_id);
+        qsort(student_list_field_data.rows, student_list_field_data.number_of_rows, sizeof(RowData), compare_id);
     else if (sort_mode == 2)
-        qsort(field_data.rows, field_data.number_of_rows, sizeof(RowData), compare_name);
-    else if (sort_mode >= 3 && sort_mode < 3 + field_data.semCols) {
+        qsort(student_list_field_data.rows, student_list_field_data.number_of_rows, sizeof(RowData), compare_name);
+    else if (sort_mode >= 3 && sort_mode < 3 + student_list_field_data.semCols) {
         sort_gpa_sem = sort_mode - 3;
-        qsort(field_data.rows, field_data.number_of_rows, sizeof(RowData), compare_gpa_desc);
+        qsort(student_list_field_data.rows, student_list_field_data.number_of_rows, sizeof(RowData), compare_gpa_desc);
     } else
-        qsort(field_data.rows, field_data.number_of_rows, sizeof(RowData), compare_cgpa_desc);
+        qsort(student_list_field_data.rows, student_list_field_data.number_of_rows, sizeof(RowData), compare_cgpa_desc);
     return EXIT_SUCCESS;
 }
 
@@ -799,22 +810,22 @@ static inline void wprintw_center(WINDOW* win, int width, char* format, ...) {
 static inline void wprintw_header(WINDOW* win, bool standout) {
     int crow, ccol;
     getyx(win, crow, ccol);
-    wprintw(win, "%s", field_data.idFieldString);
-    wmove(win, crow, ccol + field_data.idFieldLen + field_data.fieldSeperateLen);
+    wprintw(win, "%s", student_list_field_data.idFieldString);
+    wmove(win, crow, ccol + student_list_field_data.idFieldLen + student_list_field_data.fieldSeperateLen);
 
     getyx(win, crow, ccol);
-    wprintw(win, "%s", field_data.nameFieldString);
-    wmove(win, crow, ccol + field_data.nameFieldLen + field_data.fieldSeperateLen);
+    wprintw(win, "%s", student_list_field_data.nameFieldString);
+    wmove(win, crow, ccol + student_list_field_data.nameFieldLen + student_list_field_data.fieldSeperateLen);
 
-    for (int i = 1; i <= field_data.semCols; i++) {
+    for (int i = 1; i <= student_list_field_data.semCols; i++) {
         getyx(win, crow, ccol);
-        wprintw(win, field_data.gpaFieldString, i);
-        wmove(win, crow, ccol + field_data.gpaFieldLen + field_data.fieldSeperateLen);
+        wprintw(win, student_list_field_data.gpaFieldString, i);
+        wmove(win, crow, ccol + student_list_field_data.gpaFieldLen + student_list_field_data.fieldSeperateLen);
     }
 
     getyx(win, crow, ccol);
-    wprintw_center(win, field_data.cgpaFieldLen, field_data.cgpaFieldString);
-    wmove(win, crow, ccol + field_data.gpaFieldLen + field_data.fieldSeperateLen);
+    wprintw_center(win, student_list_field_data.cgpaFieldLen, student_list_field_data.cgpaFieldString);
+    wmove(win, crow, ccol + student_list_field_data.gpaFieldLen + student_list_field_data.fieldSeperateLen);
     if (standout)
         wstandout_line(win, crow, 0);
 }
@@ -842,23 +853,23 @@ static inline void wprintw_footer(WINDOW* win, bool standout) {
 static inline void standout_sorted_header(int sort_mode, int color_pair) {
     int start = 0, end = 0;
     if (sort_mode >= 1)
-        end += field_data.idFieldLen;
+        end += student_list_field_data.idFieldLen;
     if (sort_mode >= 2) {
-        end += field_data.fieldSeperateLen;
+        end += student_list_field_data.fieldSeperateLen;
         start = end;
-        end += field_data.nameFieldLen;
+        end += student_list_field_data.nameFieldLen;
     }
     if (sort_mode >= 3) {
-        for (int i = 3; i <= sort_mode && i < 3 + field_data.semCols; i++) {
-            end += field_data.fieldSeperateLen;
+        for (int i = 3; i <= sort_mode && i < 3 + student_list_field_data.semCols; i++) {
+            end += student_list_field_data.fieldSeperateLen;
             start = end;
-            end += field_data.gpaFieldLen;
+            end += student_list_field_data.gpaFieldLen;
         }
     }
-    if (sort_mode >= 3 + field_data.semCols) {
-        end += field_data.fieldSeperateLen;
+    if (sort_mode >= 3 + student_list_field_data.semCols) {
+        end += student_list_field_data.fieldSeperateLen;
         start = end;
-        end += field_data.cgpaFieldLen;
+        end += student_list_field_data.cgpaFieldLen;
     }
     mvwchgat(stdscr, 1, start, end-start, A_STANDOUT, color_pair, NULL);
 }
@@ -903,8 +914,8 @@ int free_row(RowData* pRow) {
 }
 
 int free_rows() {
-    for (int i = 0; i < field_data.number_of_rows; i++)
-        free_row(&field_data.rows[i]);
-    free(field_data.rows);
+    for (int i = 0; i < student_list_field_data.number_of_rows; i++)
+        free_row(&student_list_field_data.rows[i]);
+    free(student_list_field_data.rows);
     return EXIT_SUCCESS;
 }
