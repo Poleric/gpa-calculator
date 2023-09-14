@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gpa-calculator 1.0\n"
 "Report-Msgid-Bugs-To: noreply@example.com\n"
-"POT-Creation-Date: 2023-09-14 09:14+0800\n"
+"POT-Creation-Date: 2023-09-14 17:34+0800\n"
 "PO-Revision-Date: 2023-09-10 20:08+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -16,121 +16,121 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:69
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:70
 #, c-format
 msgid ""
 "Failed to set language. Does your system does not support this language?"
 msgstr ""
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:77
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:164
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:250
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:78
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:165
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:251
 msgid "GPA/CGPA CALCULATOR"
 msgstr "GPA/CGPA Kalkulator"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:79
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:80
 #, c-format
 msgid "ADMIN ENTER 1\n"
 msgstr "ADMIN MASUKKAN 1\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:80
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:81
 #, c-format
 msgid "STUDENT ENTER 2\n"
 msgstr "PELAJAR MASUKKAN 2\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:82
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:188
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:83
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:189
 #, c-format
 msgid "EXIT ENTER %d\n"
 msgstr "KELUAR MASUKKAN %d\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:83
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:84
 #, c-format
 msgid "ENTER AS ADMIN/STUDENT : "
 msgstr "MASUKKAN SEBAGAI ADMIN/PELAJAR: "
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:101
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:102
 #, c-format
 msgid "PLEASE CHOOSE THE NUMBER AGAIN: "
 msgstr "SILA PILIH NOMBOR SEKALI LAGI: "
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:117
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:118
 #, c-format
 msgid "Language\n"
 msgstr "Bahasa\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:125
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:126
 #, c-format
 msgid "Enter a number > "
 msgstr "Masukkan nombor > "
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:130
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:131
 #, c-format
 msgid "%d is not a valid option. Please input again.\n"
 msgstr "%d bukan pilihan yang sah. Sila masukkan sekali lagi.\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:166
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:167
 #, c-format
 msgid "ADMINISTRATOR\n"
 msgstr "PENTADBIR\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:167
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:253
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:168
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:254
 #, c-format
 msgid "SCHOOL: KOLEJ PASAR\n"
 msgstr "SEKOLAH: KOLEJ PASAR\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:168
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:254
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:169
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:255
 #, c-format
 msgid "DATE: %s,%d-%02d-%02d\n"
 msgstr "TARIKH: %s,%d-%02d-%02d\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:181
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:182
 msgid "WELCOME TO THE ADMIN SCREEN"
 msgstr "SELAMAT DATANG KE SKRIN ADMIN"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:183
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:184
 #, c-format
 msgid "VIEW student list ENTER 1\n"
 msgstr "MELIHAT senarai pelajar MASUKKAN 1\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:184
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:185
 #, c-format
 msgid "GET a student details ENTER 2\n"
 msgstr "DAPATKAN butiran pelajar MASUKKAN 2\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:185
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:186
 #, c-format
 msgid "STORE student ENTER 3\n"
 msgstr "SIMPAN pelajar MASUKKAN 3\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:186
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:187
 #, c-format
 msgid "DELETE student ENTER 4\n"
 msgstr "MEMADAM pelajar MASUKKAN 4\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:189
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:190
 #, c-format
 msgid "ENTER: "
 msgstr "MASUKKAN: "
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:223
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:224
 #, c-format
 msgid "ENTER THE PASSWORD: "
 msgstr "MASUKKAN KATA LALAUN: "
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:231
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:232
 #, c-format
 msgid "PASSWORD INCORRECT\n"
 msgstr "KATA LALAUN SALAH\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:232
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:233
 #, c-format
 msgid "PLEASE ENTER THE PASSWORD AGAIN(%i): "
 msgstr "SILA MASUKKAN KATA LALAUN SEKALI LAGI(%i): "
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:234
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:235
 #, fuzzy, c-format
 msgid ""
 "!!!YOU HAVE ENTER THE INCORRECT ANSWER TOO MANY TIMES, PLEASE TRY AGAIN "
@@ -139,94 +139,104 @@ msgstr ""
 "!!!ANDA DAH TERLALU BANYAK MASUK KATA LALAUN YANG SALAH, SILA CUBA LAGI "
 "NANTI!!!\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:236
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:237
 #, c-format
 msgid ""
 "If you have forgotten the password, please contact to look for help: %s\n"
 msgstr ""
 "Jika anda terlupa kata laluan, sila hubungi untuk mendapatkan bantuan: %s\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:237
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:238
 #, c-format
 msgid "OR send us a email: %s\n"
 msgstr "ATAU hantarkan e-mel kepada kami: %s\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:252
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:253
 #, c-format
 msgid "STUDENT\n"
 msgstr "PELAJAR\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:280
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:281
 #, c-format
 msgid "PLEASE ENTER THE STUDENT ID: "
 msgstr "SILA MASUKKAN ID PELAJAR: "
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:291
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:292
 #, c-format
 msgid "You entered a wrong ID (Enter %s to exit)\n"
 msgstr "Anda memasukkan ID yang salah (Masukkan %s untuk keluar)\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:320
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:321
 msgid "Are you sure you want to delete this entry?"
 msgstr "Adakah anda pasti mahu memadamkan entri ini?"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:321
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:322
 msgid "ENTER 0 to CANCEL"
 msgstr "MASUKKAN 0 untuk BATAL"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:322
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:323
 msgid "ENTER 1 to DELETE"
 msgstr "MASUKKAN 1 untuk PADAM"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:326
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:327
 #, c-format
 msgid "> "
 msgstr "> "
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:340
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:341
 msgid "The number you've entered is invalid. Please enter again."
 msgstr ""
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:346
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:347
 #, c-format
 msgid "DETAILS:\n"
 msgstr "BUKTIR:\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:348
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:349
 #, c-format
 msgid "Student ID: %s\n"
 msgstr "ID Pelajar: %s\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:349
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:350
 #, c-format
 msgid "Student Name: %s\n"
 msgstr "Nama Pelajar: %s\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:350
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:351
 #, c-format
 msgid "Total enrolled courses: %d\n"
 msgstr "Jumlah kursus yang didaftarkan: %d\n"
 
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:384
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:357
+#, c-format
+msgid "%s is eligible to graduate."
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:359
+#, c-format
+msgid "%s is not eligible to graduate."
+msgstr ""
+
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:391
 #, c-format
 msgid "Sem %-*d"
 msgstr "Sem %-*d"
 
 #. can be printed
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:439
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:447
 #, c-format
 msgid "GPA: %-*.2f"
 msgstr "GPA: %-*.2f"
 
 #. no course within that sem
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:441
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:453
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:449
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:461
 #, fuzzy, c-format
 msgid "GPA: %-*s"
 msgstr "GPA: %-*.2f"
 
 #. can be printed
-#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:451
+#: /home/biblion/Code/C/gpa-calculator/src/main_menu.c:459
 #, c-format
 msgid "CGPA: %-*.2f"
 msgstr "CGPA: %-*.2f"
@@ -269,12 +279,12 @@ msgid "INVALID DAY"
 msgstr "HARI TIDAK SAH"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:26
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:602
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:594
 msgid "Student ID"
 msgstr "ID Pelajar"
 
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:27
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:606
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:598
 #, fuzzy
 msgid "Student Name"
 msgstr "Nama Pelajar: %s\n"
@@ -309,79 +319,79 @@ msgstr "Pelajar Kolej Pasar"
 msgid "Inserting Student"
 msgstr "Memasukkan Pelajar"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:424
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:423
 msgid "Do you want to add another course? "
 msgstr "Adakah anda ingin menambah kursus lain? "
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:438
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:437
 msgid "Save record? "
 msgstr "Simpan rekod?"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:599
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:591
 msgid "Student Info"
 msgstr "Maklumat Pelajar"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:602
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:606
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:594
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:598
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:607
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:611
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:615
 #: /home/biblion/Code/C/gpa-calculator/src/gui.c:619
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:623
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:627
 #, c-format
 msgid "%-15s: "
 msgstr "%-15s: "
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:611
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:635
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:603
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:627
 #, c-format
 msgid "Course %d Info"
 msgstr "Kursus %d Maklumat"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:615
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:638
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:607
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:630
 msgid "Course code"
 msgstr "Kod kursus"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:619
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:641
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:611
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:633
 msgid "Semester"
 msgstr "Semester"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:623
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:644
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:615
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:636
 msgid "Credit Hours"
 msgstr "Jam kredit"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:627
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:647
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:619
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:639
 msgid "Grade"
 msgstr "Gred"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:655
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:647
 msgid "YES"
 msgstr "YA"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:661
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:653
 msgid "NO"
 msgstr "TIDAK"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:837
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:831
 msgid "Quit"
 msgstr "Berhenti"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:842
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:836
 msgid "Change Sort Mode"
 msgstr "Tukar Mod Isih"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:847
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:841
 msgid "Scroll"
 msgstr "Tatal"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:848
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:842
 msgid "View Details"
 msgstr "Lihat Butiran"
 
-#: /home/biblion/Code/C/gpa-calculator/src/gui.c:848
+#: /home/biblion/Code/C/gpa-calculator/src/gui.c:842
 msgid "Delete"
 msgstr ""
 
