@@ -87,16 +87,17 @@ int student_list_menu(sqlite3* db) {
     student_list_field_data.number_of_rows = max_students;
     init_rows(db);
 
-    int current_row = 0, selection = 0, update = 1;
+    int current_row = 0, selection = 0, update_screen = 1;
     int input;
     int sort_mode = 1; // 1 - id, 2 - name, 3+ - gpa, ..., cgpa
+    SQLStudent* student; // used for details and delete
 
     student_list_win = newwin(student_list_field_data.height, student_list_field_data.width, 2, 0);
     keypad(student_list_win, TRUE);
     leaveok(student_list_win, TRUE);
     curs_set(0);
     do {
-        if (update) {
+        if (update_screen) {
             wstandout_line(stdscr, 1, 1);
             standout_sorted_header(sort_mode, 2);
             refresh();
@@ -108,31 +109,30 @@ int student_list_menu(sqlite3* db) {
             wrefresh(student_list_win);
 
             wmove(student_list_win, 0, 0);
-            update = 0;
+            update_screen = 0;
         }
 
         input = wgetch(student_list_win);
-        SQLStudent* stud; // used for details and delete
         switch(input) {
             // scroll up and down
             case KEY_UP:
                 if (current_row > 0 && selection < max_students - student_list_field_data.height + 1) {  // magic numbers
                     current_row--;
-                    update = 1;
+                    update_screen = 1;
                 }
                 if (selection > 0) {
                     selection--;
-                    update = 1;
+                    update_screen = 1;
                 }
                 break;
             case KEY_DOWN:
                 if (current_row < max_students - student_list_field_data.height) {
                     current_row++;
-                    update = 1;
+                    update_screen = 1;
                 }
                 if (selection < max_students - 1) {
                     selection++;
-                    update = 1;
+                    update_screen = 1;
                 }
                 break;
             // change sorting option
@@ -140,14 +140,14 @@ int student_list_menu(sqlite3* db) {
                 if (sort_mode > 1) {
                     sort_mode--;
                     sort_row(sort_mode);
-                    update = 1;
+                    update_screen = 1;
                 }
                 break;
             case KEY_RIGHT:
                 if (sort_mode < 3 + student_list_field_data.semCols) {
                     sort_mode++;
                     sort_row(sort_mode);
-                    update = 1;
+                    update_screen = 1;
                 }
                 break;
             case KEY_ENTER:
@@ -157,9 +157,9 @@ int student_list_menu(sqlite3* db) {
                 endwin();
 
                 clear_screen();
-                stud = get_student(db, student_list_field_data.rows[selection].studentID);
-                printFullStudentDetails(stud);
-                free_student(stud);
+                student = get_student(db, student_list_field_data.rows[selection].studentID);
+                printFullStudentDetails(student);
+                free_student(student);
                 pause();
 
                 reset_prog_mode();
@@ -170,9 +170,9 @@ int student_list_menu(sqlite3* db) {
                 endwin();
 
                 clear_screen();
-                stud = get_student(db, student_list_field_data.rows[selection].studentID);
-                deleteStudent(stud);
-                free_student(stud);
+                student = get_student(db, student_list_field_data.rows[selection].studentID);
+                deleteStudent(student);
+                free_student(student);
 
                 free_rows();
 
@@ -181,11 +181,11 @@ int student_list_menu(sqlite3* db) {
                 student_list_field_data.number_of_rows = max_students;
                 init_rows(db);
 
-                update = 1;
+                update_screen = 1;
                 reset_prog_mode();
                 refresh();
                 break;
-            default:
+            default:  // include 'q'
                 break;
         }
     } while (input != 'q');
@@ -209,8 +209,8 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
     curs_set(1);
 
     // inputs
-    char *student_id = NULL, *student_name = NULL;
     Student student;
+    char* student_id = NULL, *student_name = NULL;
     Course** courses = NULL;
     int win_w = COLS - 4, win_h = LINES - 4, current_row = 0;
 
@@ -244,15 +244,15 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
         int current_course = (insert_field_data.current_selection - 2) / insert_field_data.number_of_course_fields;  // starts at 0
 
         if (current_course == number_of_courses) {  // if no course, make new
-            Course **tmp = realloc(courses, (number_of_courses + 1) * sizeof(Course *));
-            if (tmp == NULL) {
+            Course **courses_tmp = realloc(courses, (number_of_courses + 1) * sizeof(Course *));
+            if (courses_tmp == NULL) {
                 log_alloc_error("insert_student_name", "courses");
                 free(courses);
                 clear();
                 endwin();
                 return EXIT_FAILURE;
             }
-            courses = tmp;
+            courses = courses_tmp;
 
             // build course
             Course *course = malloc(sizeof(Course));
@@ -308,7 +308,7 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
                         if (n > 0)  // save if theres content
                             wclrtoeol(insert_student_win);
                         else
-                            insert_field_data.current_selection++;;
+                            insert_field_data.current_selection++;
                     }
                     break;
                 case KEY_LEFT:
@@ -357,7 +357,6 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
             continue;
         }
 
-        char* dummy;
         // store input
         switch (insert_field_data.current_selection) {
             case 0:  // id
@@ -381,10 +380,10 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
                         courses[current_course]->course_code = strdup(buffer);
                         break;
                     case 1:  // sem
-                        courses[current_course]->sem = (int)strtol(buffer, &dummy, 10);
+                        courses[current_course]->sem = (int)strtol(buffer, NULL, 10);
                         break;
                     case 2:  // cred hour
-                        courses[current_course]->credit_hours = (int)strtol(buffer, &dummy, 10);
+                        courses[current_course]->credit_hours = (int)strtol(buffer, NULL, 10);
                         break;
                     case 3:  // grade
                         if (courses[current_course]->grade != NULL) {  // free memory if change
@@ -483,11 +482,11 @@ int write_student_list_window(int current_row) {
 
         // print student_name
         getyx(student_list_win, crow, ccol);
-        char* name = row.studentName;
-        if (strlen(name) > student_list_field_data.nameFieldLen) {
-            truncate_str(name, student_list_field_data.nameFieldLen);
+        char* student_name = row.studentName;
+        if (strlen(student_name) > student_list_field_data.nameFieldLen) {
+            truncate_str(student_name, student_list_field_data.nameFieldLen);
         }
-        wprintw(student_list_win, "%s", name);
+        wprintw(student_list_win, "%s", student_name);
         wmove(student_list_win, crow, ccol + student_list_field_data.nameFieldLen + student_list_field_data.fieldSeperateLen);
 
         // print gpas
@@ -535,7 +534,6 @@ void init_field_data(int max_width, int max_height, int max_sem) {
 
 int init_rows(sqlite3* db) {
     sqlite3_stmt* stmt = get_all_students_stmt(db);
-    RowData* pRow;
 
     for (
         int i = 0, ret = sqlite3_step(stmt);
@@ -575,18 +573,12 @@ int init_rows(sqlite3* db) {
 
         free_courses(pSQLCourses, number_of_courses);
 
-        pRow = malloc(sizeof(RowData));
-        if (pRow == NULL) {
-            log_alloc_error("init_rows", "pRow");
-            return EXIT_FAILURE;
-        }
-        pRow->studentID = stud_id;
-        pRow->studentName = stud_name;
-        pRow->gpas = gpas;
-        pRow->cgpa = cgpa;
-
-        student_list_field_data.rows[i] = *pRow;
-        free(pRow);
+        student_list_field_data.rows[i] = (RowData){
+            stud_id,
+            stud_name,
+            gpas,
+            cgpa
+        };
     }
     sqlite3_finalize(stmt);
     return EXIT_SUCCESS;
@@ -729,6 +721,9 @@ void move_to_inputting(WINDOW* win) {
                     break;
                 default:
                     fprintf(stderr, "move_to_inputting: You shouldn't be here");
+                    // move to top
+                    y = insert_field_data.insertFieldCoords.studentIdY;
+                    x = insert_field_data.insertFieldCoords.studentIdX;
             }
     }
     wmove(win, y, x);
@@ -736,7 +731,6 @@ void move_to_inputting(WINDOW* win) {
 
 int validate_input(char * input) {
     long integer_input;
-    char *buff;
 
     switch (insert_field_data.current_selection) {
         case 0:  // id
@@ -750,7 +744,7 @@ int validate_input(char * input) {
                     else return 1;
                 case 1:  // sem
                 case 2:  // cred hour
-                    integer_input = strtol(input, &buff, 10);
+                    integer_input = strtol(input, NULL, 10);
                     if (integer_input <= 0) return 0;
                     return 1;
                 case 3:  // grade
