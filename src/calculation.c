@@ -39,6 +39,8 @@ float get_gpa_from_courses(Course** pCourses, int number_of_courses, int sem) {
 }
 
 int get_gpas_from_courses(Course** pCourses, int number_of_courses, float* buff, int buff_len) {
+    /* Stores gpa OF EACH sem into the given buffer */
+
     float* total_quality_points = calloc(buff_len, sizeof(float));
     if (total_quality_points == NULL) {
         log_alloc_error("get_gpas_from_courses", "total_quality_points");
