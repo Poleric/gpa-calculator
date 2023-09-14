@@ -242,9 +242,7 @@ int insert_student_menu(sqlite3* db) {  // this is so horrible lmao
     keypad(insert_student_win, TRUE);
     do {
         int current_course = (insert_field_data.current_selection - 2) / insert_field_data.number_of_course_fields;  // starts at 0
-        mvwprintw(stdscr, 0, 0, "%d", insert_field_data.current_selection);
-        refresh();
-
+        
         if (current_course == number_of_courses) {  // if no course, make new
             Course **tmp = realloc(courses, (number_of_courses + 1) * sizeof(Course *));
             if (tmp == NULL) {
