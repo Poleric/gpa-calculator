@@ -33,8 +33,8 @@ int setenv(const char* name, const char* value, int overwrite)
 
 // language defines
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
-#define ENGLISH_UK "English_UnitedKingdom"
-#define ENGLISH_US "English_UnitedStates"
+#define ENGLISH_UK "English"
+#define ENGLISH_US "English"
 #define CHINESE_CN "Chinese-Simplified"
 #define MALAY_MY "Malay"
 #else
@@ -64,13 +64,13 @@ int main() {
 	sqlite3_open("students.db",&db);  //connect database
     init_student_db(db);
 
-    clear_screen();
-
+    #ifdef linux
     // set system default locale
     setlocale(LC_ALL, "");
     bindtextdomain("gpa-calculator", LOCALE_DIR);
     textdomain("gpa-calculator");
-
+    #endif
+    clear_screen();
     const char* locale = promptLanguage();
     if (setLocale(locale) == NULL) {
         fprintf(stderr, _("Failed to set language. Does your system does not support this language?"));
@@ -149,7 +149,11 @@ char* setLocale(const char* lang_code) {
     setenv("LANGUAGE", lang_code, 1);
     set_locale = setlocale(LC_ALL, "");
     if (set_locale == NULL) {  // add .UTF-8 if fail
-        char* lang_utf = malloc(strlen(lang_code) + 1 + 6);
+        char* lang_utf = malloc(strlen(lang_code) + 2 + 6);
+        if (lang_utf == NULL) {
+            log_alloc_error("setLocale", "lang_utf");
+            return NULL;
+        }
 
         strcpy(lang_utf, lang_code);
         strcat(lang_utf, ".UTF-8");
